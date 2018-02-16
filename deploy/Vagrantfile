@@ -41,11 +41,5 @@ SCRIPT
   config.vm.provision "shell", inline: $ansible
   config.vm.provision "shell", inline: $python
   config.vm.provision "shell", inline: 'ansible-playbook /vagrant/ansible/dev.yml -c local'
-
-  #config.vm.provision "ansible_local" do |ansible|
-  #  ansible.playbook = "/vagrant/ansible/dev.yml"
-  #  ansible.limit = "all,localhost"
-  #end
-
-#
+  
 end
