@@ -2,6 +2,9 @@ Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/trusty64"
   config.vm.synced_folder ".", "/vagrant"
 
+  #Connect server mongo to localhost
+  config.vm.network :forwarded_port, guest: 27017, host: 27017
+
   config.vm.provider "virtualbox" do |vb|
      vb.memory = "1024"
      vb.name = "dev"
@@ -37,10 +40,12 @@ SCRIPT
 
   config.vm.provision "shell", inline: $ansible
   config.vm.provision "shell", inline: $python
+  config.vm.provision "shell", inline: 'ansible-playbook /vagrant/ansible/dev.yml -c local'
 
-  config.vm.provision "ansible_local" do |ansible|
-    ansible.playbook = "/vagrant/ansible/dev.yml"
-  end
+  #config.vm.provision "ansible_local" do |ansible|
+  #  ansible.playbook = "/vagrant/ansible/dev.yml"
+  #  ansible.limit = "all,localhost"
+  #end
 
 #
 end
