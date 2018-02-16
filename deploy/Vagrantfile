@@ -1,5 +1,6 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/trusty64"
+  config.vm.synced_folder ".", "/vagrant"
 
   config.vm.provider "virtualbox" do |vb|
      vb.memory = "1024"
@@ -38,7 +39,7 @@ SCRIPT
   config.vm.provision "shell", inline: $python
 
   config.vm.provision "ansible_local" do |ansible|
-    ansible.playbook = "dev.yml"
+    ansible.playbook = "/vagrant/ansible/dev.yml"
   end
 
 #
