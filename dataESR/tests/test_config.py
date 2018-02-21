@@ -1,7 +1,7 @@
 import unittest
 import ConfigParser
 import os
-from config.config import ConfigDatabase
+from config import ConfigDatabase
 
 class TestConfigDatabase(unittest.TestCase):
     def test_config_database(self):
