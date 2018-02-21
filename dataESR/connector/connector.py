@@ -1,19 +1,23 @@
 import logging
-#from config import ConfigDatabase
+import psycopg2
+from config.config import ConfigDatabase
 
 class ConnectorDatabase(object):
-    def __init__(self, pathconfig=None):
+    def __init__(self, pathconfig):
         self.params = ConfigDatabase(pathconfig)
         self.connection = None
+        self.type_db = None
 
     def _connect_to_psql(self):
         """ Connect to psql database server """
+        self.type_db = 'postgresql'
         conn = None
         try:
             # read connection parameters
             # connect to the PostgreSQL server
             logging.info('Connecting to the PostgreSQL database...')
-            self.connection = psycopg2.connect(**self.params)
+            params = self.params.get_config(section="postgresql")
+            self.connection = psycopg2.connect(**params)
             # create a cursor
             cur = self.connection.cursor()
         # execute a statement

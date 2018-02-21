@@ -13,3 +13,4 @@ class TestConnector(unittest.TestCase):
         connector = ConnectorDatabase(filename)
         connector._connect_to_psql()
         psqlconnect.assert_called_with(**connector.params.get_config(section='postgresql'))
+        self.assertEquals(connector.type_db, 'postgresql')

@@ -13,5 +13,6 @@ class ConfigDatabase(object):
             self.config_dbs = config_dbs
         else:
             raise Exception('Config file empty, no sections found.')
+
     def get_config(self, section):
         return self.config_dbs[section]
