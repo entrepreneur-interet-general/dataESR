@@ -1,5 +1,6 @@
 import logging
 import psycopg2
+import pandas as pd
 from config.config import ConfigDatabase
 
 class ConnectorDatabase(object):
@@ -29,3 +30,23 @@ class ConnectorDatabase(object):
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
+
+    def _extract_table_psql_to_df(self, table, columns=None):
+        if self.connection is None:
+            raise Exception("Connector not connected to a database")
+        else:
+            cur = self.connection.cursor()
+            if columns:
+                columns = ", ".join(columns)
+                query = """SELECT %(columns)s FROM %(table)s"""
+            else:
+                query = """SELECT * FROM %(table)s"""
+            return pd.read_sql_query(query, params={"columns": columns,
+                                "table": table}, con=self.connection)
+
+    def extract_df(self, type, **kwargs):
+        self._connect_to_psql()
+        if type is None:
+            raise Exception('Specify the type of database you working with')
+        elif type == 'postgresql':
+            return self._extract_table_psql_to_df(**kwargs)
