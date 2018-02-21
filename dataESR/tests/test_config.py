@@ -8,13 +8,11 @@ class TestConfigDatabase(unittest.TestCase):
         path_dir = os.path.dirname(os.path.abspath(__file__))
         filename = os.path.join(path_dir, "testconfig/testdatabase.ini")
         self.assertEquals(
-            ConfigDatabase(filename).get_config(),
+            ConfigDatabase(filename).get_config(section="postgresql"),
             {
-                'postgresql': {
-                    "host": "localhost",
-                    "database": "db",
-                    "user": "postgres",
-                    "password": "postgres"
-                }
+                "host": "localhost",
+                "database": "db",
+                "user": "postgres",
+                "password": "postgres"
             }
         )
