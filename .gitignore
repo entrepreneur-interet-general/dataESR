@@ -13,3 +13,7 @@ ehthumbs.db
 
 
 *.pyc
+*.xml
+*.iml
+.vscode/
+.virtualenvs/
