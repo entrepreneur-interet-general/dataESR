@@ -17,3 +17,6 @@ ehthumbs.db
 *.iml
 .vscode/
 .virtualenvs/
+*.db
+*.pid
+unittests.cfg
