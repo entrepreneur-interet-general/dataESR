@@ -20,3 +20,6 @@ ehthumbs.db
 *.db
 *.pid
 unittests.cfg
+logs/
+.pytest_cache/
+.coverage

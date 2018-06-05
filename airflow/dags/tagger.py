@@ -5,13 +5,25 @@ Tagger
 from airflow import DAG
 from datetime import datetime, timedelta
 from mongo_plugin import MongoHook
-from airflow.operators.python_operator import ShortCircuitOperator
+from airflow.operators.python_operator import PythonOperator
+from airflow.models import BaseOperator
 import logging
+from pymongo import MongoClient
 
-MONGO_CONN_ID = 'localhost:27017'
+MONGO_LOGIN = ''
+MONGO_PASSWORD = ''
+MONGO_CONN_ID = 'localhost'
+MONGO_PORT = '27017'
 MONGO_DB = 'wikipedia'
 MONGO_COLLECTION = 'wiki_en'
 
+mongo_uri = {
+    'login': MONGO_LOGIN,
+    'password': MONGO_PASSWORD,
+    'host': MONGO_CONN_ID,
+    'port': MONGO_PORT,
+    'database': MONGO_DB
+}
 
 default_args = {
     'owner': 'airflow',
@@ -32,12 +44,10 @@ dag = DAG(
     'tagger', default_args=default_args)
 
 def check_mongo_db(**kwargs):
-    mongo_conn_id = kwargs.get('mongo_conn_id')
+    mongo_uri = kwargs.get('mongo_uri')
     mongo_db = kwargs.get('mongo_db')
     mongo_collection = kwargs.get('mongo_collection')
-
-    mongo_conn = MongoHook(conn_id=mongo_conn_id).get_conn()
-
+    mongo_conn = MongoHook(mongo_uri).get_conn()
     # Grab collection
     collection = mongo_conn.get_database(mongo_db).get_collection(mongo_collection)
 
@@ -50,9 +60,9 @@ def check_mongo_db(**kwargs):
         return False
     
 with dag:
-    mongo = ShortCircuitOperator(task_id='check_mongo',
-                                 python_callable=check_mongo_db,
-                                 op_kwargs={"mongo_conn_id": MONGO_CONN_ID,
-                                            "mongo_db": MONGO_DB,
-                                            "mongo_collection": MONGO_COLLECTION},
-                                 provide_context=True)
+    mongo = PythonOperator(task_id='check_mongo',
+                           python_callable=check_mongo_db,
+                           op_kwargs={"mongo_uri": mongo_uri,
+                                   "mongo_db": MONGO_DB,
+                                   "mongo_collection": MONGO_COLLECTION},
+                           provide_context=True)
