@@ -1,0 +1,8 @@
+-r ./requirements.txt
+
+# tests
+pytest
+pytest-cov
+codecov
+tox-travis
+mock==2.0.0
