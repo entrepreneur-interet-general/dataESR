@@ -12,6 +12,4 @@ jobs:
     stage: integrity_tests_airflow
     script:
         - airflow initdb
-        # Add a dummy environment file to make the dag valid
-        - echo "prd" > dags/environment.conf
         - coverage run -m pytest tests/airflow/integrity_tests/*
