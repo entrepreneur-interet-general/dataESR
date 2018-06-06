@@ -4,13 +4,10 @@ import importlib
 import os
 
 import pytest
-from airflow import models as af_models
+from airflow.models import DAG
 
-DAG_PATH = os.path.join(
-    os.path.dirname(__file__), '..', 'dags'
-)
-
-DAG_FILES = [f for f in os.listdir(DAG_PATH) if f.endswith('airflowfile.py')]
+DAG_PATH = os.getenv('DAGS_HOME')
+DAG_FILES = [f for f in os.listdir(DAG_PATH) if f.endswith('.py')]
 
 
 @pytest.mark.parametrize('dag_file', DAG_FILES)
@@ -22,5 +19,5 @@ def test_dag_integrity(dag_file):
     module = importlib.util.module_from_spec(mod_spec)
     mod_spec.loader.exec_module(module)
     assert any(
-        isinstance(var, af_models.DAG)
+        isinstance(var, DAG)
         for var in vars(module).values())

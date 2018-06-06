@@ -1,10 +1,17 @@
+env:
+  AIRFLOW_HOME=$TRAVIS_BUILD_DIR/airflow
 language: python
 python:
-  - "2.7"
-# command to install dependencies
+  - "3.6"
+git:
+  depth: false
 install:
   - "pip install -r requirements.txt"
-# command to run tests
-script:
-  - cd dataESR/
-  - python -m unittest discover
+jobs:
+  include:
+    stage: integrity_tests_airflow
+    script:
+        - airflow initdb
+        # Add a dummy environment file to make the dag valid
+        - echo "prd" > dags/environment.conf
+        - coverage run -m pytest tests/airflow/integrity_tests/*
