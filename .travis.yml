@@ -9,7 +9,14 @@ install:
   - "pip install -r requirements-dev.txt"
 jobs:
   include:
-    stage: integrity_tests_airflow
+    - stage: linting
+    install:
+      - pip install flake8
+    script:
+      - flake8
+    - stage: integrity_tests_airflow
     script:
         - airflow initdb
         - coverage run -m pytest tests/airflow/integrity_tests/*
+        - codecov
+    

@@ -1,8 +1,8 @@
 -r ./requirements.txt
 
 # tests
+flake8
 pytest
-pytest-cov
 codecov
 tox-travis
 mock==2.0.0
