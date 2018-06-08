@@ -13,10 +13,12 @@ jobs:
     install:
       - pip install flake8
     script:
-      - flake8
+      - flake8 ./airflow ./tests
     - stage: integrity_tests_airflow
     script:
         - airflow initdb
         - coverage run -m pytest tests/airflow/integrity_tests/*
         - codecov
-    
+stages:
+  - linting
+  - integrity_tests_airflow

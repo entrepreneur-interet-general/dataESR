@@ -40,7 +40,8 @@ class MongoHook(BaseHook):
             database='' if conn.schema is None else conn.schema
         )
 
-        # Mongo Connection Options dict that is unpacked when passed to MongoClient
+        # Mongo Connection Options dict that is unpacked
+        # when passed to MongoClient
         options = self.extras
 
         # If we are using SSL disable requiring certs from specific hostname
@@ -57,9 +58,14 @@ class MongoHook(BaseHook):
         mongo_db = mongo_db if mongo_db is not None else self.connection.schema
         mongo_conn = self.get_conn()
 
-        return mongo_conn.get_database(mongo_db).get_collection(mongo_collection)
+        return mongo_conn.get_database(
+                            mongo_db).get_collection(mongo_collection)
 
-    def aggregate(self, mongo_collection, aggregate_query, mongo_db=None, **kwargs):
+    def aggregate(self,
+                  mongo_collection,
+                  aggregate_query,
+                  mongo_db=None,
+                  **kwargs):
         """
         Runs and aggregation pipeline and returns the results
         https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.aggregate
@@ -69,7 +75,12 @@ class MongoHook(BaseHook):
 
         return collection.aggregate(aggregate_query, **kwargs)
 
-    def find(self, mongo_collection, query, find_one=False, mongo_db=None, **kwargs):
+    def find(self,
+             mongo_collection,
+             query,
+             find_one=False,
+             mongo_db=None,
+             **kwargs):
         """
         Runs a mongo find query and returns the results
         https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find
@@ -81,7 +92,11 @@ class MongoHook(BaseHook):
         else:
             return collection.find(query, **kwargs)
 
-    def insert_one(self, mongo_collection, doc, mongo_db=None, **kwargs):
+    def insert_one(self,
+                   mongo_collection,
+                   doc,
+                   mongo_db=None,
+                   **kwargs):
         """
         Inserts a single document into a mongo collection
         https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_one
@@ -90,7 +105,11 @@ class MongoHook(BaseHook):
 
         return collection.insert_one(doc, **kwargs)
 
-    def insert_many(self, mongo_collection, docs, mongo_db=None, **kwargs):
+    def insert_many(self,
+                    mongo_collection,
+                    docs,
+                    mongo_db=None,
+                    **kwargs):
         """
         Inserts many docs into a mongo collection.
         https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_many
@@ -99,7 +118,12 @@ class MongoHook(BaseHook):
 
         return collection.insert_many(docs, **kwargs)
 
-    def replace_one(self, mongo_collection, replacement_filter, doc, mongo_db=None, **kwargs):
+    def replace_one(self,
+                    mongo_collection,
+                    replacement_filter,
+                    doc,
+                    mongo_db=None,
+                    **kwargs):
         """
         Replaces a single document that matches a filter in a mongo collection.
         https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.replace_one
@@ -108,7 +132,12 @@ class MongoHook(BaseHook):
 
         return collection.replace_one(replacement_filter, doc, **kwargs)
 
-    def update_one(self, mongo_collection, update_filter, update, mongo_db=None, **kwargs):
+    def update_one(self,
+                   mongo_collection,
+                   update_filter,
+                   update,
+                   mongo_db=None,
+                   **kwargs):
         """
         Updates a single document that matches a filter in a mongo collection.
         https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.update_one
@@ -117,7 +146,12 @@ class MongoHook(BaseHook):
 
         return collection.update_one(update_filter, update, **kwargs)
 
-    def update_many(self, mongo_collection, update_filter, update, mongo_db=None, **kwargs):
+    def update_many(self,
+                    mongo_collection,
+                    update_filter,
+                    update,
+                    mongo_db=None,
+                    **kwargs):
         """
         Updates many docs that matches a filter in a mongo collection.
         https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.update_many
@@ -126,7 +160,11 @@ class MongoHook(BaseHook):
 
         return collection.update_many(update_filter, update, **kwargs)
 
-    def bulk_write(self, mongo_collection, requests, mongo_db=None, **kwargs):
+    def bulk_write(self,
+                   mongo_collection,
+                   requests,
+                   mongo_db=None,
+                   **kwargs):
         """
         Submits a bulk write job mongo based on the specified requests.
         https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.bulk_write
