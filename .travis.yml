@@ -23,12 +23,9 @@ jobs:
         - airflow initdb
         - coverage run -m pytest tests/airflow/integrity_tests/*
         - codecov
-    - stage: install
-    script:
-        - sudo make install
     - stage: run
     script:
-        - sudo make run-worker
+        - sudo make run
 stages:
   - linting
   - integrity_tests_airflow

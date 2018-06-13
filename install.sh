@@ -8,6 +8,8 @@ echo '-----------------------------------'
 
 
 echo 'exporting env. var'
+echo '-----------------------------------'
+
 export DISK_LOCATION=/mnt/disk1
 export DATA_LOCATION=$DISK_LOCATION/data
 
@@ -22,16 +24,23 @@ export AIRFLOW_HOME=$DISK_LOCATION/dataESR/airflow
 export MONGO_VOLUME=$DATA_LOCATION/mongo
 export POSTGRESQL_VOLUME=$DATA_LOCATION/psql
 
-echo 'Finished exporting var.\n'
+echo '-----------------------------------'
+echo 'Finished exporting var.'
+echo '-----------------------------------'
+
 
 echo 'Checking environnement'
+echo '-----------------------------------'
+
 
 for i in ${DISK_LOCATION} ${DATA_LOCATION} ${AIRFLOW_HOME} ${MONGO_VOLUME} ${POSTGRESQL_VOLUME}
     do 
-        if [[ -z "${i}" ]]; then
+        if [ -z ${i+x} ]; then
             echo '$i is not set'
             exit 1
         fi
     done
 
 echo 'Environment checked: all variables are set.\n'
+echo '-----------------------------------'
+
