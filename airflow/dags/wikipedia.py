@@ -5,18 +5,20 @@ from airflow import DAG
 from datetime import datetime, timedelta
 
 
-
 def check_wikipedia_db():
     pass
 
 def fill_up_wikipedia_db():
     pass
 
+
 def get_q_id():
     pass
 
+
 def get_instances_subclasses():
     pass
+
 
 default_args = {
     'owner': 'airflow',
