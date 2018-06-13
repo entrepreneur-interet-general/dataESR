@@ -24,7 +24,7 @@ jobs:
     - stage: install
       script: sudo make install
     - stage: run
-      script: sudo make run-worker
+      script: sudo make run
 stages:
   - linting
   - integrity_tests_airflow
