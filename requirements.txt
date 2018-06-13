@@ -1,0 +1,6 @@
+#apache-airflow
+git+https://github.com/apache/incubator-airflow@master
+pymongo
+cryptography
+textacy
+SPARQLWrapper

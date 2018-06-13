@@ -1,0 +1,8 @@
+-r ./requirements.txt
+
+# tests
+flake8
+pytest
+codecov
+tox-travis
+mock==2.0.0

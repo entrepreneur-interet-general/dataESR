@@ -1,0 +1,36 @@
+env:
+  AIRFLOW_HOME=$TRAVIS_BUILD_DIR/airflow
+language: python
+cache:
+  - pip
+services:
+  - docker
+python:
+  - "3.6"
+git:
+  depth: false
+install:
+  - "pip install -r requirements-dev.txt"
+jobs:
+  include:
+    - stage: linting
+    install:
+      - pip install flake8
+    script:
+      - flake8 ./airflow ./tests
+    - stage: integrity_tests_airflow
+    script:
+        - airflow initdb
+        - coverage run -m pytest tests/airflow/integrity_tests/*
+        - codecov
+    - stage: install
+    script:
+        - sudo make install
+    - stage: run
+    script:
+        - sudo make run-worker
+stages:
+  - linting
+  - integrity_tests_airflow
+  - install
+  - run

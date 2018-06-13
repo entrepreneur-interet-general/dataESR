@@ -1,0 +1,89 @@
+version: '2.1'
+services:
+  redis:
+    container_name: "redis"
+    image: redis:3.2.7
+
+  postgres:
+    container_name: "psql"
+    image: postgres:9.6
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    volumes:
+      - ${POSTGRESQL_VOLUME}:/var/lib/postgresql/data/pgdata
+
+  mongo:
+    image: mongo
+    container_name: "mongodb"
+    ports:
+      - "27017:27017"
+    volumes:
+      - ${MONGO_VOLUME}:/data/db
+
+  webserver:
+    image: puckel/docker-airflow:1.9.0-4
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+      - mongo
+    volumes:
+      - ./airflow/dags
+    ports:
+      - "8080:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  flower:
+      image: puckel/docker-airflow:1.9.0-4
+      restart: always
+      depends_on:
+          - redis
+      environment:
+          - EXECUTOR=Celery
+      ports:
+          - "5555:5555"
+      command: flower
+
+  scheduler:
+      image: puckel/docker-airflow:1.9.0-4
+      restart: always
+      depends_on:
+          - webserver
+      volumes:
+          - ./airflow/dags:/usr/local/airflow/dags
+          # Uncomment to include custom plugins
+          # - ./plugins:/usr/local/airflow/plugins
+      environment:
+          - LOAD_EX=n
+          - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+          - EXECUTOR=Celery
+          # - POSTGRES_USER=airflow
+          # - POSTGRES_PASSWORD=airflow
+          # - POSTGRES_DB=airflow
+          # - REDIS_PASSWORD=redispass
+      command: scheduler
+
+  worker:
+      image: puckel/docker-airflow:1.9.0-4
+      restart: always
+      depends_on:
+          - scheduler
+      volumes:
+          - ./airflow/dags:/usr/local/airflow/dags
+          # Uncomment to include custom plugins
+          # - ./plugins:/usr/local/airflow/plugins
+      environment:
+          - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+          - EXECUTOR=Celery
+          # - POSTGRES_USER=airflow
+          # - POSTGRES_PASSWORD=airflow
+          # - POSTGRES_DB=airflow
+          # - REDIS_PASSWORD=redispass
+      command: worker
