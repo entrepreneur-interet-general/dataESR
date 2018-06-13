@@ -30,7 +30,7 @@ services:
       - redis
       - mongo
     volumes:
-      - ./airflow/dags
+      - ./airflow/dags:/usr/local/airflow/dags
     ports:
       - "8080:8080"
     command: webserver
