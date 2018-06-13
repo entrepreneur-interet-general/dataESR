@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 def check_wikipedia_db():
     pass
 
+
 def fill_up_wikipedia_db():
     pass
 
