@@ -4,7 +4,7 @@ Tagger
 
 from airflow import DAG
 from datetime import datetime, timedelta
-from mongo_plugin import MongoHook
+from airflow.contrib.hooks.mongo_hook import MongoHook
 from airflow.operators.python_operator import PythonOperator
 import logging
 
