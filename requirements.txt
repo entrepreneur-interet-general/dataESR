@@ -1,5 +1,5 @@
-apache-airflow
-#git+https://github.com/apache/incubator-airflow/tree/master
+#apache-airflow
+git+https://github.com/apache/incubator-airflow@master
 pymongo
 cryptography
 textacy
