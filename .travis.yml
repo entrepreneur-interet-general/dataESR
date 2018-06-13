@@ -14,21 +14,17 @@ install:
 jobs:
   include:
     - stage: linting
-    install:
-      - pip install flake8
-    script:
-      - flake8 ./airflow ./tests
+      install: pip install flake8
+      script: flake8 ./airflow ./tests
     - stage: integrity_tests_airflow
-    script:
+      script:
         - airflow initdb
         - coverage run -m pytest tests/airflow/integrity_tests/*
         - codecov
     - stage: install
-    script:
-        - sudo make install
+      script: sudo make install
     - stage: run
-    script:
-        - sudo make run-worker
+      script: sudo make run-worker
 stages:
   - linting
   - integrity_tests_airflow
