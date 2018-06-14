@@ -8,6 +8,9 @@ export AIRFLOW_HOME=${DISK_LOCATION}/dataESR/airflow
 export MONGO_VOLUME=${DATA_LOCATION}/mongo
 export POSTGRESQL_VOLUME=${DATA_LOCATION}/psql
 
+export http_proxy=
+export https_proxy=
+
 DC := 'docker-compose'
 
 install:
@@ -15,6 +18,13 @@ install:
 up:
 	${DC} up
 run: install up
-	${DC} run worker
+	${DC} --name dataESR-airflow run worker
 logs:
 	@docker logs
+
+stop:
+	${DC} down
+clean: clean-images
+	${DC} rm
+clean-images:
+	docker rmi -f dataesr_webserver dataesr_worker dataesr_flower dataesr_scheduler

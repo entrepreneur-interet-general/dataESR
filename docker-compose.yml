@@ -23,7 +23,10 @@ services:
       - ${MONGO_VOLUME}:/data/db
 
   webserver:
-    image: puckel/docker-airflow:1.9.0-4
+    build:
+      context: .
+      args:
+        proxy: ${http_proxy}
     restart: always
     depends_on:
       - postgres
@@ -31,7 +34,7 @@ services:
       - mongo
     volumes:
       - ./airflow/dags:/usr/local/airflow/dags
-      - ${PWD}/requirements.txt:/requirements.txt
+      - ./requirements.txt:/requirements.txt
     ports:
       - "8080:8080"
     command: webserver
@@ -42,18 +45,24 @@ services:
       retries: 3
 
   flower:
-      image: puckel/docker-airflow:1.9.0-4
-      restart: always
-      depends_on:
-          - redis
-      environment:
-          - EXECUTOR=Celery
-      ports:
-          - "5555:5555"
-      command: flower
+    build:
+      context: .
+      args:
+        proxy: ${http_proxy}
+    restart: always
+    depends_on:
+        - redis
+    environment:
+        - EXECUTOR=Celery
+    ports:
+        - "5555:5555"
+    command: flower
 
   scheduler:
-      image: puckel/docker-airflow:1.9.0-4
+      build:
+        context: .
+        args:
+          proxy: ${http_proxy}
       restart: always
       depends_on:
           - webserver
@@ -72,7 +81,10 @@ services:
       command: scheduler
 
   worker:
-      image: puckel/docker-airflow:1.9.0-4
+      build:
+        context: .
+        args:
+          proxy: ${http_proxy}
       restart: always
       depends_on:
           - scheduler
