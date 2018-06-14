@@ -31,7 +31,7 @@ services:
       - mongo
     volumes:
       - ./airflow/dags:/usr/local/airflow/dags
-      - ${PWD}/requirements.txt:requirements.txt
+      - ${PWD}/requirements.txt:/requirements.txt
     ports:
       - "8080:8080"
     command: webserver
