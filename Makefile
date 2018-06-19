@@ -13,18 +13,19 @@ export https_proxy=
 
 DC := 'docker-compose'
 
-install:
-	$(foreach i, $(dbs), @sudo mkdir -p $(DATA_LOCATION)/$i)
-up:
-	${DC} up
-run: install up
+create-env:
+	$(foreach i, $(dbs), sudo mkdir -p $(DATA_LOCATION)/$i)
+build:
+	${DC} up -d 
+install: create-env build
+run-worker:
 	${DC} --name dataESR-airflow run worker
 logs:
-	@docker logs
-
+	${DC} logs --f
 stop:
 	${DC} down
-clean: clean-images
-	${DC} rm
+clean: clean-images stop
+	${DC} rm -f
 clean-images:
 	docker rmi -f dataesr_webserver dataesr_worker dataesr_flower dataesr_scheduler
+relaunch: clean run

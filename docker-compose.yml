@@ -6,13 +6,16 @@ services:
 
   postgres:
     container_name: "psql"
-    image: postgres:9.6
+    image: postgres
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_USER=airflow
       - POSTGRES_PASSWORD=airflow
       - POSTGRES_DB=airflow
-    volumes:
-      - ${POSTGRESQL_VOLUME}:/var/lib/postgresql/data/pgdata
+    #TODO: benig able to save psql db, not working at the moment
+    #volumes:
+    #  - ${POSTGRESQL_VOLUME}:/var/lib/postgresql/data/pgdata
 
   mongo:
     image: mongo
@@ -23,18 +26,22 @@ services:
       - ${MONGO_VOLUME}:/data/db
 
   webserver:
+    container_name: webserver
     build:
       context: .
       args:
         proxy: ${http_proxy}
     restart: always
+    environment:
+      - LOAD_EX=y
+      - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+      - EXECUTOR=Celery
     depends_on:
       - postgres
       - redis
       - mongo
     volumes:
       - ./airflow/dags:/usr/local/airflow/dags
-      - ./requirements.txt:/requirements.txt
     ports:
       - "8080:8080"
     command: webserver
@@ -45,6 +52,7 @@ services:
       retries: 3
 
   flower:
+    container_name: flower
     build:
       context: .
       args:
@@ -52,13 +60,16 @@ services:
     restart: always
     depends_on:
         - redis
+        - mongo
     environment:
         - EXECUTOR=Celery
     ports:
         - "5555:5555"
     command: flower
 
+
   scheduler:
+      container_name: scheduler
       build:
         context: .
         args:
@@ -71,7 +82,7 @@ services:
           # Uncomment to include custom plugins
           # - ./plugins:/usr/local/airflow/plugins
       environment:
-          - LOAD_EX=n
+          - LOAD_EX=y
           - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
           - EXECUTOR=Celery
           # - POSTGRES_USER=airflow
@@ -81,6 +92,7 @@ services:
       command: scheduler
 
   worker:
+      container_name: worker
       build:
         context: .
         args:

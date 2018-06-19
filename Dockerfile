@@ -2,7 +2,7 @@ FROM python:3.6
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
-ENV TERM linux
+ENV TERM linux 
 
 # Airflow
 ARG AIRFLOW_VERSION=1.9.0
@@ -19,6 +19,7 @@ ENV http_proxy $proxy
 ENV https_proxy $proxy
 
 COPY requirements.txt /requirements.txt
+COPY ./script/ /script
 
 RUN set -ex \
     && buildDeps=' \
@@ -38,6 +39,7 @@ RUN set -ex \
     && apt-get install -yqq --no-install-recommends \
         $buildDeps \
         python3-pip \
+        git \
         python3-requests \
         mysql-client \
         mysql-server \
@@ -70,14 +72,18 @@ RUN set -ex \
         /usr/share/doc \
         /usr/share/doc-base
 
+RUN apt-get update && apt-get install -y git
+RUN pip install git+https://github.com/apache/incubator-airflow@master
+
 COPY script/entrypoint.sh /entrypoint.sh
-COPY airflow/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
+COPY airflow/airflow.cfg /usr/local/airflow/airflow.cfg
 
-RUN chown -R airflow: ${AIRFLOW_HOME}
+RUN python -m spacy download fr
+RUN chown -R airflow: /usr/local/airflow
 
-EXPOSE 8080 5555 8793
+EXPOSE 8080 5555 8793 5432 6379
 
 USER airflow
-WORKDIR ${AIRFLOW_HOME}
-ENTRYPOINT ["sh", "/entrypoint.sh"]
+WORKDIR /usr/local/airflow
+ENTRYPOINT ["sh", "/script/entrypoint.sh"]
 CMD ["webserver"] # set default arg for entrypoint

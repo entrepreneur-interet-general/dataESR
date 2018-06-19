@@ -1,6 +1,8 @@
 #apache-airflow
 git+https://github.com/apache/incubator-airflow@master
+psycopg2
 pymongo
 cryptography
 textacy
 SPARQLWrapper
+psycopg2-binary
