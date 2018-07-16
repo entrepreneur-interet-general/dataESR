@@ -38,9 +38,16 @@ if __name__ == '__main__':
 
     subject = re.compile(r'.+?(?= \(|:|-)')
     infos = re.compile(r'\((.+?)(-|:)(.+?)\)')
+    sc = re.compile(r'(.+?)( - | : )(.+)')
     connection = MongoClient('localhost', 27017)
+    db = connection.CNRS
+    coll = db.annuaire
     titres = [re.search(subject, x).group(0) for x in read_file('cnrs_annuaire')]
     print('Total titres: {}'.format(len(titres)))
     total = 0
     for l in read_file('cnrs_annuaire'):
         titre = re.search(subject, l).group(0)
+        if 'Sc.' in titre:
+            titre = re.search(sc, l).group(3)
+        coll.insert_one({'terme': titre})
+
