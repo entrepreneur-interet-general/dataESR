@@ -87,7 +87,6 @@ def add_element_from_properties(repo, _id, id_from_property, property_name):
     coll.update_one({'_id': _id}, {'$addToSet':
                     {field: {'id': id_from_property, 'label': info['label']}}},
                     upsert=True)
-import pywikibot
 
 
 def run_property(repo, property_id='P31'):
