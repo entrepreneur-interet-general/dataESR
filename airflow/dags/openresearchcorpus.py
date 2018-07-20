@@ -25,6 +25,7 @@ dag = DAG('openresearchcorpus', default_args=default_args)
 
 with dag:
     download = BashOperator(
+        task_id='download-open-corpus',
         bash_command='wget -P {{PATH_DOWNLOAD}} -i \
         https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/open-corpus/\
             manifest.txt',
@@ -32,5 +33,6 @@ with dag:
                 'PATH_DECOMPRESS': PATH_DECOMPRESS}
     )
     decompress = BashOperator(
+        task_id='decompress-open-corpus',
         bash_command='gzip -d {{PATH_DOWNLOAD}}/*.gz > {{PATH_DECOMPRESS}}'
     )
