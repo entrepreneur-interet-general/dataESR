@@ -6,3 +6,4 @@ cryptography
 textacy
 SPARQLWrapper
 psycopg2-binary
+celery
