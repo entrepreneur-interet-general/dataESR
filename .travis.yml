@@ -1,8 +1,5 @@
 env:
   AIRFLOW_HOME=$TRAVIS_BUILD_DIR/airflow
-  POSTGRES_USER=airflow
-  POSTGRES_PASSWORD=airflow
-  POSTGRES_DB=airflow
 language: python
 cache:
   - pip
@@ -13,6 +10,9 @@ python:
   - "3.6"
 git:
   depth: false
+before_install:
+  - psql -U postgres -c "CREATE USER airflow WITH PASSWORD 'airflow'"
+  - psql -U airflow -c "CREATE DATABASE airflow"
 install:
   - "pip install -r requirements-dev.txt"
 jobs:
