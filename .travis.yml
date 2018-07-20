@@ -12,7 +12,7 @@ git:
   depth: false
 before_install:
   - psql -U postgres -c "CREATE USER airflow WITH PASSWORD 'airflow'"
-  - psql -U airflow -c "CREATE DATABASE airflow"
+  - psql -U postgres -c "CREATE DATABASE airflow"
 install:
   - "pip install -r requirements-dev.txt"
 jobs:
