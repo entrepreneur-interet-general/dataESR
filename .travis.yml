@@ -1,10 +1,14 @@
 env:
   AIRFLOW_HOME=$TRAVIS_BUILD_DIR/airflow
+  POSTGRES_USER=airflow
+  POSTGRES_PASSWORD=airflow
+  POSTGRES_DB=airflow
 language: python
 cache:
   - pip
 services:
   - docker
+  - postgresql
 python:
   - "3.6"
 git:
@@ -18,7 +22,7 @@ jobs:
       script: flake8 ./airflow ./tests
     - stage: integrity_tests_airflow
       script:
-        - sudo airflow initdb
+        - airflow initdb
         - coverage run -m pytest tests/airflow/integrity_tests/*
         - codecov
     - stage: install
