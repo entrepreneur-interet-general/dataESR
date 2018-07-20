@@ -30,7 +30,9 @@ jobs:
         - sudo service postgresql stop
         - sudo make install
     - stage: run
-      script: sudo make run
+      script:
+        - sudo service postgresql stop
+        - sudo make run
 stages:
   - linting
   - integrity_tests_airflow
