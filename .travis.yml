@@ -18,7 +18,7 @@ jobs:
       script: flake8 ./airflow ./tests
     - stage: integrity_tests_airflow
       script:
-        - airflow initdb
+        - sudo airflow initdb
         - coverage run -m pytest tests/airflow/integrity_tests/*
         - codecov
     - stage: install
