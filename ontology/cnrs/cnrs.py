@@ -50,16 +50,18 @@ if __name__ == '__main__':
     site = pywikibot.Site("wikidata", "wikidata")
     repo = site.data_repository()
     query = """
-    SELECT ?item ?itemLabel 
-    WHERE 
+    SELECT ?item ?itemLabel
+    WHERE
     {
     ?item wdt:%s wd:%s.
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    SERVICE wikibase:label { bd:serviceParam wikibase:language
+    "[AUTO_LANGUAGE],en". }
     }
     """
     dependencies = {'endpoint': None, 'entity_url': None}
     query_object = sparql.SparqlQuery(**dependencies)
-    science = re.compile(r'(field|stud|academic|discipline|science)(y\b|ies\b|ied\b|\b|s\b)', re.IGNORECASE)
+    science = re.compile(r'(field|stud|academic|discipline|science)\
+                           (y\b|ies\b|ied\b|\b|s\b)', re.IGNORECASE)
     subject = re.compile(r'.+?(?= \(|:|-)')
     infos = re.compile(r'\((.+?)(-|:)(.+?)\)')
     sc = re.compile(r'(.+?)( - | : )(.+)')

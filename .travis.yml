@@ -26,7 +26,9 @@ jobs:
         - coverage run -m pytest tests/airflow/integrity_tests/*
         - codecov
     - stage: install
-      script: sudo make install
+      script: 
+        - sudo service postgresql stop
+        - sudo make install
     - stage: run
       script: sudo make run
 stages:

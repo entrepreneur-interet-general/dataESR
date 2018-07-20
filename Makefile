@@ -20,6 +20,7 @@ build:
 install: create-env build
 run-worker:
 	${DC} run -d --name dataESR-airflow worker
+run: run-worker
 logs:
 	${DC} logs --f
 stop:
