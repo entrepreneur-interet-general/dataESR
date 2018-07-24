@@ -4,13 +4,12 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-
 from scrapy.contrib.exporter import CsvItemExporter
 import json
 
 
-class GifasPipeline(object):
- 
+class GicanPipeline(object):
+
     def open_spider(self, spider):
         self.file = open("gifas.csv", 'wb')
         self.exporter = CsvItemExporter(self.file, unicode)
@@ -36,4 +35,3 @@ class JsonWriterPipeline(object):
     def process_item(self, item, spider):
         line = json.dumps(dict(item)) + "\n"
         self.file.write(line)
-        return item

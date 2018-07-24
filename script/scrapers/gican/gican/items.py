@@ -8,14 +8,12 @@
 import scrapy
 
 
-class GifasItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
+class GicanItem(scrapy.Item):
     name = scrapy.Field()
-    adresse = scrapy.Field()
+    resume = scrapy.Field()
+    nomenclature = scrapy.Field()
     logo = scrapy.Field()
+    adresse = scrapy.Field()
     site = scrapy.Field()
-    activites = scrapy.Field()
-    ixactivites = scrapy.Field()
     dirigeants = scrapy.Field()
-    groupe = scrapy.Field()
+    contact = scrapy.Field()
