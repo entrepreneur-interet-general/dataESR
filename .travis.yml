@@ -1,5 +1,6 @@
 env:
   AIRFLOW_HOME=$TRAVIS_BUILD_DIR/airflow
+  AIRFLOW_GPL_UNIDECODE=yes
 language: python
 cache:
   - pip
