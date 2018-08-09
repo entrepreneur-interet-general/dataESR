@@ -16,6 +16,7 @@ import os
 import codecs
 import pickle
 import re
+import tqdm
 
 from pywikibot.tools import open_archive
 from pywikibot import config, i18n
@@ -141,8 +142,40 @@ class CategoryDatabase(object):
                 pywikibot.output(u'Database is empty. %s removed'
                                  % config.shortpath(filename))
 
-    def dump_neo(self):
-        graph = Graph(host='10.243.98.93', user='neo4j', password='admin')
+    def dump_neo(self, host, user, password):
+        self._load()
+        graph = Graph(host=host, user=user, password=password)
+
+        pattern = r'Category:(.*)'
+        categories = {}
+
+        # building nodes
+        for cat, t in tqdm.tqdm(self.catContentDB.items()):
+            if cat.pageid not in categories:
+                categories[cat.pageid]= Node('Categorie',
+                    name=re.search(pattern, cat.title()).group(1),
+                    url=cat.full_url(),
+                    depth=cat.depth
+                )
+            subcats = t[0]
+            art = t[1]
+            for subcat in subcats:
+                if subcat.pageid not in categories:
+                    n = Node('Categorie',
+                             name=re.search(pattern, subcat.title()).group(1),
+                             url=subcat.full_url(),
+                             depth=subcat.depth
+                             )
+                    categories[subcat.pageid] = n
+                    graph.create(n)
+                    graph.create(Relationship(categories[cat.pageid], n))
+            for a in art:
+                n = Node('Article',
+                name=a.title(),
+                url=a.full_url())
+                graph.create(n)
+                graph.create(Relationship(categories[cat.pageid], 'HAS', n))
+
 
 class CategoryTreeRobot(object):
 
