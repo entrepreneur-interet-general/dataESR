@@ -168,13 +168,13 @@ class CategoryDatabase(object):
                              )
                     categories[subcat.pageid] = n
                     graph.create(n)
-                    graph.create(Relationship(categories[cat.pageid], n))
+                    graph.create(Relationship(categories[cat.pageid],' HAS_SUBCLASS', n))
             for a in art:
                 n = Node('Article',
                 name=a.title(),
                 url=a.full_url())
                 graph.create(n)
-                graph.create(Relationship(categories[cat.pageid], 'HAS', n))
+                graph.create(Relationship(categories[cat.pageid], 'HAS_ARTICLE', n))
 
 
 class CategoryTreeRobot(object):
