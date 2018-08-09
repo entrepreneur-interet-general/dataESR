@@ -185,7 +185,7 @@ class CategoryTreeRobot(object):
             # noisy dots
             pywikibot.output('.', newline=False)
         # Create a list of other cats which are supercats of the current cat
-        supercat_names = [super_cat.title()
+        supercat_names = [re.search('Category:(.*)', super_cat.title()).group(1)
                           for super_cat in self.catDB.getSupercats(cat)
                           if super_cat != parent]
         if supercat_names:
@@ -195,7 +195,6 @@ class CategoryTreeRobot(object):
             result += ' ' + comma.join(supercat_names)
         del supercat_names
         result += '\n'
-        print(result)
         if currentDepth < self.maxDepth:
             for subcat in self.catDB.getSubcats(cat):
                 # recurse into subdirectories
@@ -225,3 +224,4 @@ if __name__ == '__main__':
     catDB = CategoryDatabase(rebuild=True)
     bot = CategoryTreeRobot('Computer_science', catDB, maxDepth=1)
     bot.run()
+    catDB.dump()

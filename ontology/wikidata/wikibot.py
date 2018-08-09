@@ -1,5 +1,4 @@
 from pymongo import MongoClient
-from pywikibot.data import api
 import pywikibot
 import tqdm
 import re
@@ -8,7 +7,7 @@ import re
 site = pywikibot.Site("wikidata", "wikidata")
 repo = site.data_repository()
 
-client = MongoClient('localhost', 27017)
+client = MongoClient('10.243.98.93', 27017)
 db = client.wikidata
 coll = db.science_test
 
@@ -51,7 +50,7 @@ def get_id_from_properties(repo, entity_id, property_id='P31'):
     claims = pywikibot.ItemPage(repo, entity_id).get()['claims']
     if property_id in claims:
         for item in claims[property_id]:
-            yield {'id': item.getTarget().id, 'property': property_id}
+            yield {'_id': item.getTarget().id, 'property': property_id}
 
 
 def get_info_from_id(repo, _id):
@@ -85,15 +84,15 @@ def add_element_from_properties(repo, _id, id_from_property, property_name):
     if info is None:
         return
     coll.update_one({'_id': _id}, {'$addToSet':
-                    {field: {'id': id_from_property, 'label': info['label']}}},
+                    {field: {'_id': id_from_property, 'label': info['label']}}},
                     upsert=True)
 
 
 def run_property(repo, property_id='P31'):
     for _id in tqdm.tqdm(get_ids(coll)):
         for el in get_id_from_properties(repo, _id, property_id=property_id):
-            add_element(repo, el['id'])
-            add_element_from_properties(repo, _id, el['id'], el['property'])
+            add_element(repo, el['_id'])
+            add_element_from_properties(repo, _id, el['_id'], el['property'])
 
 ###################################################################
 #                 Lecture de la nomenclature d'istex              #
