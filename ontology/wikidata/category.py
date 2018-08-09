@@ -144,7 +144,10 @@ class CategoryDatabase(object):
 
     def dump_neo(self, host, user, password):
         self._load()
+
         graph = Graph(host=host, user=user, password=password)
+        graph.schema.create_uniqueness_constraint('Categorie', 'url')
+        graph.schema.create_uniqueness_constraint('Article', 'url')
 
         pattern = r'Category:(.*)'
         categories = {}
