@@ -27,6 +27,9 @@ services:
 
   neo4j:
       image: neo4j:latest
+      environment:
+        - NEO4J_CACHE_MEMORY=10G
+        - NEO4J_HEAP_MEMORY=10G
       ports:
           - "7474:7474"
           - "7687:7687"
