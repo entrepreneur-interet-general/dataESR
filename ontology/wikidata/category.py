@@ -270,6 +270,6 @@ class CategoryTreeRobot(object):
 
 if __name__ == '__main__':
     catDB = CategoryDatabase(rebuild=True)
-    bot = CategoryTreeRobot('Computer_science', catDB, maxDepth=1)
+    bot = CategoryTreeRobot('Scientific_disciplines', catDB, maxDepth=6)
     bot.run()
     catDB.dump_neo(host='locahost', user='neo4j', password='admin')
