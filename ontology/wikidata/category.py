@@ -248,7 +248,7 @@ class CategoryTreeRobot(object):
         """
         while currentDepth < self.maxDepth:
             pywikibot.output('Reading depth : %s/%s' 
-                            %(currentDepth, self.maxDepth))
+                            %(currentDepth, self.maxDepth - 1))
             if currentDepth == 0:
                 init_set = {cat}
             control_set = set()
@@ -272,4 +272,4 @@ if __name__ == '__main__':
     catDB = CategoryDatabase(rebuild=True)
     bot = CategoryTreeRobot('Computer_science', catDB, maxDepth=1)
     bot.run()
-    catDB.dump()
+    catDB.dump_neo()
