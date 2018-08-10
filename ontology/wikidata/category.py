@@ -171,7 +171,7 @@ class CategoryDatabase(object):
                              )
                     categories[subcat.pageid] = n
                     graph.create(n)
-                    graph.create(Relationship(categories[cat.pageid],' HAS_SUBCLASS', n))
+                    graph.create(Relationship(categories[cat.pageid],'HAS_SUBCLASS', n))
             for a in art:
                 n = Node('Article',
                 name=a.title(),
