@@ -9,3 +9,4 @@ SPARQLWrapper
 psycopg2-binary
 celery
 pywikibot
+scrapy
