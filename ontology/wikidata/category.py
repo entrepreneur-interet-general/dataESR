@@ -243,7 +243,8 @@ class CategoryTreeRobot(object):
         while currentDepth < self.maxDepth:
             pywikibot.output('Reading depth : %s/%s' 
                             %(currentDepth, self.maxDepth))
-            init_set = {cat}
+            if currentDepth == 0:
+                init_set = {cat}
             control_set = set()
             for cat in tqdm.tqdm(init_set):
                 supernames = self.catDB.getSupercats(cat)
