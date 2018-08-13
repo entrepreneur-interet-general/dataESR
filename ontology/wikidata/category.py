@@ -13,15 +13,15 @@
 
 import pywikibot
 import os
-import codecs
 import pickle
 import re
 import tqdm
 
 from pywikibot.tools import open_archive
-from pywikibot import config, i18n
+from pywikibot import config
 
 from py2neo import Graph, Node, Relationship
+
 
 class CategoryDatabase(object):
 
@@ -146,8 +146,10 @@ class CategoryDatabase(object):
         self._load()
 
         graph = Graph(host=host, user=user, password=password)
-        graph.schema.create_uniqueness_constraint('Categorie', 'url')
-        graph.schema.create_uniqueness_constraint('Article', 'url')
+        graph.schema.create_uniqueness_constraint('Categorie', 'name')
+        graph.schema.create_uniqueness_constraint('Article', 'name')
+        graph.schema.create_index('Categorie', 'name')
+        graph.schema.create_index('Article', 'name')
 
         pattern = r'Category:(.*)'
         categories = {}
@@ -155,7 +157,7 @@ class CategoryDatabase(object):
         # building nodes
         for cat, t in tqdm.tqdm(self.catContentDB.items()):
             if cat.pageid not in categories:
-                categories[cat.pageid]= Node('Categorie',
+                categories[cat.pageid] = Node('Categorie',
                     name=re.search(pattern, cat.title()).group(1),
                     url=cat.full_url(),
                     depth=cat.depth
@@ -171,13 +173,15 @@ class CategoryDatabase(object):
                              )
                     categories[subcat.pageid] = n
                     graph.create(n)
-                    graph.create(Relationship(categories[cat.pageid],'HAS_SUBCLASS', n))
+                    graph.create(Relationship(categories[cat.pageid],
+                                 'HAS_SUBCLASS', n))
             for a in art:
                 n = Node('Article',
-                name=a.title(),
-                url=a.full_url())
+                         name=a.title(),
+                         url=a.full_url())
                 graph.create(n)
-                graph.create(Relationship(categories[cat.pageid], 'HAS_ARTICLE', n))
+                graph.create(Relationship(categories[cat.pageid],
+                             'HAS_ARTICLE', n))
 
 
 class CategoryTreeRobot(object):
@@ -272,4 +276,4 @@ if __name__ == '__main__':
     catDB = CategoryDatabase(rebuild=True)
     bot = CategoryTreeRobot('Scientific_disciplines', catDB, maxDepth=6)
     bot.run()
-    catDB.dump_neo(host='locahost', user='neo4j', password='admin')
+    catDB.dump_neo(host='localhost', user='neo4j', password='admin')
