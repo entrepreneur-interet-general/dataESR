@@ -38,9 +38,9 @@ services:
           - $HOME/neo4j/conf:/conf
 
   webserver:
-    container_name: webserver
+    container_name: airflow-webserver
     build:
-      context: .
+      context: ./airflow
       args:
         proxy: ${http_proxy}
     restart: always
@@ -64,9 +64,9 @@ services:
       retries: 3
 
   flower:
-    container_name: flower
+    container_name: airflow-flower
     build:
-      context: .
+      context: ./airflow
       args:
         proxy: ${http_proxy}
     restart: always
@@ -79,11 +79,10 @@ services:
         - "5555:5555"
     command: flower
 
-
   scheduler:
-      container_name: scheduler
+      container_name: airflow-scheduler
       build:
-        context: .
+        context: ./airflow
         args:
           proxy: ${http_proxy}
       restart: always
@@ -104,9 +103,9 @@ services:
       command: scheduler
 
   worker:
-      container_name: worker
+      container_name: airflow-worker
       build:
-        context: .
+        context: ./airflow
         args:
           proxy: ${http_proxy}
       restart: always
@@ -124,3 +123,9 @@ services:
           # - POSTGRES_DB=airflow
           # - REDIS_PASSWORD=redispass
       command: worker
+  
+  elasticsearch:
+      container_name: es
+      image: elasticsearch:5.6.10
+      ports: 
+        - "9200:9200"

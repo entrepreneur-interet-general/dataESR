@@ -18,9 +18,9 @@ create-env:
 build:
 	${DC} up -d 
 install: create-env build
-run-worker:
-	${DC} run -d --name dataESR-airflow worker
-run: run-worker
+run-worker-airflow:
+	${DC} run -d airflow-worker
+run-airflow: run-worker-airflow
 logs:
 	${DC} logs --f
 stop:
@@ -28,5 +28,8 @@ stop:
 clean: clean-images stop
 	${DC} rm -f
 clean-images:
-	docker rmi -f dataesr_webserver dataesr_worker dataesr_flower dataesr_scheduler
+	docker rmi -f dataesr_airflow-webserver \
+		dataesr_airflow-worker \
+		dataesr_airflow-flower \
+		dataesr_airflow-scheduler
 relaunch: clean run

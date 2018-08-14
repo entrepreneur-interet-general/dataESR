@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.6-jessie
 
 # Never prompts the user for choices on installation/configuration of packages
 ENV DEBIAN_FRONTEND noninteractive
@@ -7,7 +7,6 @@ ENV TERM linux
 # Airflow
 ARG AIRFLOW_VERSION=1.9.0
 ARG AIRFLOW_HOME=/usr/local/airflow
-ARG proxy
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -15,8 +14,8 @@ ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
-ENV http_proxy $proxy
-ENV https_proxy $proxy
+ENV http_proxy http://10.244.16.10:9090
+ENV https_proxy https://10.244.16.10:9090
 
 COPY requirements.txt /requirements.txt
 COPY ./script/ /script
@@ -43,7 +42,7 @@ RUN set -ex \
         python3-requests \
         mysql-client \
         mysql-server \
-        default-libmysqlclient-dev \
+        #default-libmysqlclient-dev \
         apt-utils \
         curl \
         rsync \
