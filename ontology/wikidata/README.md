@@ -18,3 +18,14 @@ Ensuite on peut construire dans `neo4j` le graphe :
 ```python
 catDB.dump_neo(host='localhost', user='user', password='admin')
 ```
+
+##  Quelques requêtes intéressantes
+
+* Pour une catégorie comme *Fiscal policy* :
+
+Avoir toutes les catégories qui proviennent de la même categorie parente
+
+```cypher
+MATCH (:Categorie{name:"Fiscal policy"})<-[:HAS_SUBCLASS*0..]-(:Categorie)-[:HAS_SUBCLASS*0..1]->(cat:Categorie)
+RETURN cat
+```

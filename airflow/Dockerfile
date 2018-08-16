@@ -17,7 +17,7 @@ ENV LC_MESSAGES en_US.UTF-8
 ENV http_proxy http://10.244.16.10:9090
 ENV https_proxy https://10.244.16.10:9090
 
-COPY requirements.txt /requirements.txt
+COPY ./requirements.txt /requirements.txt
 COPY ./script/ /script
 
 RUN set -ex \
