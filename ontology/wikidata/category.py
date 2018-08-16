@@ -13,7 +13,7 @@
 
 import pywikibot
 import os
-import pickle
+import cPickle as pickle
 import re
 import tqdm
 
@@ -48,7 +48,7 @@ class CategoryDatabase(object):
                 if config.verbose_output:
                     pywikibot.output('Reading dump from %s'
                                      % config.shortpath(self.filename))
-                with open_archive(self.filename, 'rb') as f:
+                with open(self.filename, 'rb') as f:
                     databases = pickle.load(f)
                 # keys are categories, values are 2-tuples with lists as
                 # entries.
@@ -57,6 +57,7 @@ class CategoryDatabase(object):
                 self.superclassDB = databases['superclassDB']
                 del databases
             except Exception:
+                pywikibot.output('Failed to load file...')
                 # If something goes wrong, just rebuild the database
                 self.rebuild()
 
@@ -128,7 +129,7 @@ class CategoryDatabase(object):
                 'superclassDB': self.superclassDB
             }
             # store dump to disk in binary format
-            with open_archive(filename, 'wb') as f:
+            with open(filename, 'wb') as f:
                 try:
                     pickle.dump(databases, f, protocol=config.pickle_protocol)
                 except pickle.PicklingError as e:
@@ -273,7 +274,11 @@ class CategoryTreeRobot(object):
 
 
 if __name__ == '__main__':
-    catDB = CategoryDatabase(rebuild=True)
-    bot = CategoryTreeRobot('Scientific_disciplines', catDB, maxDepth=6)
-    bot.run()
-    catDB.dump_neo(host='localhost', user='neo4j', password='admin')
+    filenames = [('category_depth_4.pickle', 4), ('category_depth_5.pickle', 5), ('category_depth_6.pickle', 6)]
+    for file, depth in filenames:
+        print('Building : %s' % file)
+        catDB = CategoryDatabase(rebuild=True, filename=file)
+        bot = CategoryTreeRobot('Scientific_disciplines', catDB, maxDepth=depth)
+        bot.run()
+        catDB.dump()
+    #catDB.dump_neo(host='localhost', user='neo4j', password='admin')
