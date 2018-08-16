@@ -1,2 +1,2 @@
 textacy
-spacy
+flask_restful
