@@ -29,3 +29,16 @@ Avoir toutes les catégories qui proviennent de la même categorie parente
 MATCH (:Categorie{name:"Fiscal policy"})<-[:HAS_SUBCLASS*0..]-(:Categorie)-[:HAS_SUBCLASS*0..1]->(cat:Categorie)
 RETURN cat
 ```
+
+## Pickles
+
+Pour charger un fichier pickle spécifique :
+```
+catDB = CatagoryDatabase(filename='fichier_pickle')
+catDB._load()
+```
+Cela donne accès directement aux bases enregistrées :
+- superclassDB
+- catContentDB
+
+`catContentDB` correspond à un dictionnaire où la clé est un object `Category` *X* et la valeur un tuple de `set` où le premier élément et l'ensemble des sous catégorie, et le second les articles qui ont cette catégorie *X*.
