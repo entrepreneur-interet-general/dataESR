@@ -154,6 +154,7 @@ class CategoryDatabase(object):
 
         pattern = r'Category:(.*)'
         categories = {}
+        articles = {}
 
         # building nodes
         for cat, t in tqdm.tqdm(self.catContentDB.items()):
@@ -174,13 +175,19 @@ class CategoryDatabase(object):
                              )
                     categories[subcat.pageid] = n
                     graph.create(n)
-                    graph.create(Relationship(categories[cat.pageid],
-                                 'HAS_SUBCLASS', n))
+                else:
+                    n = categories[subcat.pageid]
+                graph.create(Relationship(categories[cat.pageid],
+                                          'HAS_SUBCLASS', n))
             for a in art:
-                n = Node('Article',
-                         name=a.title(),
-                         url=a.full_url())
-                graph.create(n)
+                if a.pageid not in articles:
+                    n = Node('Article',
+                             name=a.title(),
+                             url=a.full_url())
+                    articles[a.pageid] = n
+                    graph.create(n)
+                else:
+                    n = articles[a.pageid]
                 graph.create(Relationship(categories[cat.pageid],
                              'HAS_ARTICLE', n))
 
