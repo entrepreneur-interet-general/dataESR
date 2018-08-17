@@ -41,4 +41,4 @@ Cela donne accès directement aux bases enregistrées :
 - superclassDB
 - catContentDB
 
-`catContentDB` correspond à un dictionnaire où la clé est un object `Category` *X* et la valeur un tuple de `set` où le premier élément et l'ensemble des sous catégorie, et le second les articles qui ont cette catégorie *X*.
+`catContentDB` correspond à un dictionnaire où la clé est un object `Category` *X* et la valeur un tuple de `set` où le premier élément est l'ensemble des sous catégories, et le second les articles qui ont cette catégorie *X*.
