@@ -10,4 +10,4 @@ ENV https_proxy https://10.244.16.10:9090
 RUN pip install -r requirements.txt
 RUN python -m spacy download fr
 ENTRYPOINT ["python"]
-CMD ["app.py"]
+CMD ["src/app.py"]

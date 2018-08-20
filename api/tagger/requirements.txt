@@ -1,2 +1,3 @@
 textacy
 flask_restful
+cld2-cffi
