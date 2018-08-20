@@ -47,7 +47,7 @@ class TextacyResponse(Resource):
             tc = TextacyFormatting(data, lang=data.get('lang'))        
             try:
                 keywords = tc.get_keyterms()
-                return json.dump({'keywords': keywords})
+                return {'keywords': keywords}, 200
             except Exception as e:
                 abort(400, e)        
 
