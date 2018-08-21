@@ -23,8 +23,8 @@ jobs:
       script: flake8 ./airflow ./tests
     - stage: integrity_tests_airflow
       script:
-        - airflow initdb
-        - coverage run -m pytest tests/airflow/integrity_tests/*
+        - cd api/tagger
+        - coverage run -m pytest tests
         - codecov
     - stage: install
       script: 
@@ -36,6 +36,6 @@ jobs:
         - sudo make run
 stages:
   - linting
-  - integrity_tests_airflow
+  - tagger
   - install
   - run
