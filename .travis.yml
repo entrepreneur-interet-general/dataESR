@@ -24,6 +24,9 @@ jobs:
       install: pip install flake8
       script: flake8 ./airflow ./tests
     - stage: tagger
+      install:   
+        - pip uninstall -y six
+        - pip install six>=1.11.0
       script:
         - cd api/tagger
         - sudo pip install -r requirements.txt
