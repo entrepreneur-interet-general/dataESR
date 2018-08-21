@@ -2,3 +2,4 @@ textacy
 flask_restplus
 cld2-cffi
 coverage
+pytest
