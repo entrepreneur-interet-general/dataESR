@@ -15,7 +15,7 @@ before_install:
   - psql -U postgres -c "CREATE USER airflow WITH PASSWORD 'airflow'"
   - psql -U postgres -c "CREATE DATABASE airflow"
 install:
-  - "pip install -r requirements-dev.txt"
+  - "sudo pip install -r requirements-dev.txt"
 jobs:
   include:
     - stage: linting
