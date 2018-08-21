@@ -1,3 +1,4 @@
+sudo: true
 env:
   AIRFLOW_HOME=$TRAVIS_BUILD_DIR/airflow
 language: python
