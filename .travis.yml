@@ -24,6 +24,7 @@ jobs:
     - stage: tagger
       script:
         - cd api/tagger
+        - pip install -r requirements.txt
         - coverage run -m pytest tests
         - codecov
     - stage: install
