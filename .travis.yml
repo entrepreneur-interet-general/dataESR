@@ -21,7 +21,7 @@ jobs:
     - stage: linting
       install: pip install flake8
       script: flake8 ./airflow ./tests
-    - stage: integrity_tests_airflow
+    - stage: tagger
       script:
         - cd api/tagger
         - coverage run -m pytest tests
