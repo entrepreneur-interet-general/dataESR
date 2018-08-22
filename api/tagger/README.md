@@ -1,3 +1,5 @@
+Version supportée : `python 2.7`
+
 # Lancer
 Pour lancer l'api :
 ```

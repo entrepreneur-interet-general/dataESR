@@ -1,4 +1,4 @@
-from flask import jsonify, json
+from flask import json
 from src.app import app
 import unittest
 from operator import itemgetter

@@ -1,4 +1,4 @@
-FROM python:3.5
+FROM python:2.7
 
 EXPOSE 5000
 COPY . /app

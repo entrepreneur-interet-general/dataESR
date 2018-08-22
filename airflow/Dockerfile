@@ -59,9 +59,10 @@ RUN set -ex \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
     && pip install -r requirements.txt \
+    && pip install apache-airflow[celery,postgres,hive,hdfs,jdbc] \
     && pip install celery[redis]==4.1.1 \
     && apt-get purge --auto-remove -yqq $buildDeps \
-    && apt-get autoremove -yqq --purge \
+    && apt-get autoremove -yqq --purge -yqq $buildDeps libpq-dev \  
     && apt-get clean \
     && rm -rf \
         /var/lib/apt/lists/* \
@@ -72,8 +73,6 @@ RUN set -ex \
         /usr/share/doc-base
 
 RUN apt-get update && apt-get install -y git
-
-RUN pip install apache-airflow
 
 COPY airflow.cfg /usr/local/airflow/airflow.cfg
 COPY script/entrypoint.sh /entrypoint.sh
