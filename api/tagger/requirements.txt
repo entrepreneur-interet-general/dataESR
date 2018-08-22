@@ -1,5 +1,10 @@
 textacy
+flask
 flask_restplus
 cld2-cffi
 coverage
 pytest
+pytest-cov
+codecov
+tox-travis
+enum34

@@ -26,7 +26,7 @@ jobs:
         - cd api/tagger
         - sudo pip install -r requirements.txt
         - python -m spacy download en_core_web_sm
-        - coverage run -m pytest tests
+        - python -m pytest --cov=. tests}
         - codecov
     - stage: airflow_install
       script: 
