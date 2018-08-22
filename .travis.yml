@@ -14,11 +14,10 @@ python:
   - "3.6"
 git:
   depth: false
+install:
+  - pip install spacy
 jobs:
   include:
-    - stage: linting
-      install: pip install flake8
-      script: flake8 ./airflow ./tests
     - stage: tagger
       python: "2.7"
       install:   
@@ -29,12 +28,12 @@ jobs:
         - codecov
       after_success:
         - codecov
-    - stage: airflow_install
+    - stage: airflow
+      name: linting
+      install: pip install flake8
+      script: flake8 ./airflow ./tests
+      name: install  
       script: 
         - sudo pip install -r airflow/requirements.txt
         - sudo service postgresql stop
         - sudo make install
-stages:
-  - linting
-  - tagger
-  - airflow_install
