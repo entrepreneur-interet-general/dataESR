@@ -13,10 +13,6 @@ python:
   - "3.6"
 git:
   depth: false
-before_install:
-  - psql -U postgres -c "CREATE USER airflow WITH PASSWORD 'airflow'"
-  - psql -U postgres -c "CREATE DATABASE airflow"
-  - "sudo pip install -r requirements-dev.txt"
 jobs:
   include:
     - stage: linting
@@ -32,16 +28,12 @@ jobs:
         - python -m spacy download en_core_web_sm
         - coverage run -m pytest tests
         - codecov
-    - stage: install
+    - stage: airflow_install
       script: 
+        - sudo pip install -r airflow/requirements.txt
         - sudo service postgresql stop
         - sudo make install
-    - stage: run
-      script:
-        - sudo service postgresql stop
-        - sudo make run
 stages:
   - linting
   - tagger
-  - install
-  - run
+  - airflow_install
