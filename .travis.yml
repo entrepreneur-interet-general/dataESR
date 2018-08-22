@@ -14,26 +14,19 @@ python:
   - "3.6"
 git:
   depth: false
-install:
-  - pip install spacy
 jobs:
   include:
-    - stage: tagger
-      python: "2.7"
-      install:   
-        - sudo pip install -r api/tagger/requirements.txt
-        - python -m spacy download en
-      script:
-        - python -m pytest --cov=api/tagger/tests api/tagger/tests
-        - codecov
+    -stage: tagger
+      install: pip install tox
+      script: cd api/tagger && tox
       after_success:
         - codecov
     - stage: airflow
       name: linting
       install: pip install flake8
       script: flake8 ./airflow ./tests
-      name: install  
-      script: 
-        - sudo pip install -r airflow/requirements.txt
-        - sudo service postgresql stop
-        - sudo make install
+    - script: 
+      - sudo pip install -r airflow/requirements.txt
+      - sudo service postgresql stop
+      - sudo make install
+    name: install  
