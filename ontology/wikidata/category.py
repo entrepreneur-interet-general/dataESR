@@ -23,6 +23,25 @@ from pywikibot import config
 from py2neo import Graph, Node, Relationship
 
 
+class Timeout():
+    """Timeout class using ALARM signal"""
+    class Timeout(Exception):
+        pass
+
+    def __init__(self, sec):
+        self.sec = sec
+
+    def __enter__(self):
+        signal.signal(signal.SIGALRM, self.raise_timeout)
+        signal.alarm(self.sec)
+
+    def __exit__(self, *args):
+        signal.alarm(0)
+
+    def raise_timeout(self, *args):
+        raise Timeout.Timeout()
+
+
 class CategoryDatabase(object):
 
     """Temporary database saving pages and subcategories for each category.
@@ -156,40 +175,50 @@ class CategoryDatabase(object):
         categories = {}
         articles = {}
 
-        # building nodes
-        for cat, t in tqdm.tqdm(self.catContentDB.items()):
-            if cat.pageid not in categories:
-                categories[cat.pageid] = Node('Categorie',
-                    name=re.search(pattern, cat.title()).group(1),
-                    url=cat.full_url(),
-                    depth=cat.depth
+        def add_cat(category, content):
+            if category.pageid not in categories:
+                    categories[category.pageid] = Node('Categorie',
+                        name=re.search(pattern, category.title()).group(1),
+                        url=category.full_url(),
+                        depth=category.depth
                 )
-            subcats = t[0]
-            art = t[1]
+            subcats = content[0]
+            art = content[1]
             for subcat in subcats:
                 if subcat.pageid not in categories:
                     n = Node('Categorie',
-                             name=re.search(pattern, subcat.title()).group(1),
-                             url=subcat.full_url(),
-                             depth=subcat.depth
-                             )
+                                name=re.search(pattern, subcat.title()).group(1),
+                                url=subcat.full_url(),
+                                depth=subcat.depth
+                            )
                     categories[subcat.pageid] = n
                     graph.create(n)
                 else:
                     n = categories[subcat.pageid]
-                graph.create(Relationship(categories[cat.pageid],
-                                          'HAS_SUBCLASS', n))
+                graph.create(Relationship(categories[category.pageid],
+                                        'HAS_SUBCLASS', n))
             for a in art:
                 if a.pageid not in articles:
                     n = Node('Article',
-                             name=a.title(),
-                             url=a.full_url())
+                            name=a.title(),
+                            url=a.full_url())
                     articles[a.pageid] = n
                     graph.create(n)
                 else:
                     n = articles[a.pageid]
-                graph.create(Relationship(categories[cat.pageid],
-                             'HAS_ARTICLE', n))
+                graph.create(Relationship(categories[category.pageid],
+                            'HAS_ARTICLE', n))
+
+        # building nodes
+        for cat, t in tqdm.tqdm(self.catContentDB.items()):
+            while True:
+                try:
+                    with Timeout(1500):
+                        add_cat(cat, t)
+                        break
+                except Timeout.Timeout:
+                    pywikibot.output('Operation timedout, trying again to add category.')
+                    continue
 
 
 class CategoryTreeRobot(object):
