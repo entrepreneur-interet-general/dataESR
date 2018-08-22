@@ -8,3 +8,4 @@ pytest-cov
 codecov
 tox-travis
 enum34
+spacy
