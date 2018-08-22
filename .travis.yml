@@ -16,7 +16,7 @@ git:
   depth: false
 jobs:
   include:
-    -stage: tagger
+    - stage: tagger
       install: pip install tox
       script: cd api/tagger && tox
       after_success:
