@@ -14,10 +14,10 @@ python:
   - "3.6"
 git:
   depth: false
+install: pip install tox
 jobs:
   include:
     - stage: tagger
-      install: pip install tox
       script: cd api/tagger && tox
       after_success:
         - codecov
