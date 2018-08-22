@@ -1,0 +1,9 @@
+spacy
+psycopg2
+pymongo
+py2neo
+cryptography
+textacy
+SPARQLWrapper
+psycopg2-binary
+celery

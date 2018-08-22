@@ -72,11 +72,13 @@ RUN set -ex \
         /usr/share/doc-base
 
 RUN apt-get update && apt-get install -y git
-RUN pip install git+https://github.com/apache/incubator-airflow@master
 
+RUN pip install apache-airflow
+
+COPY airflow.cfg /usr/local/airflow/airflow.cfg
 COPY script/entrypoint.sh /entrypoint.sh
-COPY airflow/airflow.cfg /usr/local/airflow/airflow.cfg
 
+RUN pip install -r /requirements.txt
 RUN python -m spacy download fr
 RUN chown -R airflow: /usr/local/airflow
 
