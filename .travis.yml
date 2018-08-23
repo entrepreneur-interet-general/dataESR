@@ -14,20 +14,9 @@ python:
   - "3.6"
 git:
   depth: false
-jobs:
-  include:
-    - stage: tagger
-      python: 2.7
-      install: pip install tox
-      script: cd api/tagger && tox
-      after_success:
-        - codecov
-    - stage: airflow
-      install: pip install flake8
-      script: flake8 ./airflow
-      name: linting
-      script: 
-        - sudo pip install -r airflow/requirements.txt
-        - sudo service postgresql stop
-        - sudo make install
-      name: install  
+install: sudo pip install flake8 -r airflow/requirements.txt
+script:
+  - cd api/tagger && tox
+  - flake8 ./airflow
+  - sudo service postgresql stop
+  - sudo make install
