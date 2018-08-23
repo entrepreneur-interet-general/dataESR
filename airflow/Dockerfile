@@ -14,8 +14,8 @@ ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
-ENV http_proxy http://10.244.16.10:9090
-ENV https_proxy https://10.244.16.10:9090
+#ENV http_proxy http://10.244.16.10:9090
+#ENV https_proxy https://10.244.16.10:9090
 
 COPY ./requirements.txt /requirements.txt
 COPY ./script/ /script
