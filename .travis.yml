@@ -15,7 +15,7 @@ python:
 git:
   depth: false
 install: pip install tox flake8
-job:
+jobs:
   include:
     - stage: tagger
       python: 2.7
