@@ -16,12 +16,13 @@ import os
 import cPickle as pickle
 import re
 import tqdm
+import signal
 
 from pywikibot.tools import open_archive
 from pywikibot import config
 
 from py2neo import Graph, Node, Relationship
-
+from pymongo import MongoClient
 
 class Timeout():
     """Timeout class using ALARM signal"""
@@ -166,8 +167,8 @@ class CategoryDatabase(object):
         self._load()
 
         graph = Graph(host=host, user=user, password=password)
-        graph.schema.create_uniqueness_constraint('Categorie', 'name')
-        graph.schema.create_uniqueness_constraint('Article', 'name')
+        #graph.schema.create_uniqueness_constraint('Categorie', 'name')
+        #graph.schema.create_uniqueness_constraint('Article', 'name')
         graph.schema.create_index('Categorie', 'name')
         graph.schema.create_index('Article', 'name')
 
@@ -221,8 +222,58 @@ class CategoryDatabase(object):
                     continue
 
 
-class CategoryTreeRobot(object):
+    def dump_mongo(self, hostname, port, database, collection, rewrite=True):
+        self._load()
 
+        client = MongoClient(hostname, port)
+        db = client[database]
+        if rewrite:
+            db[collection].drop()
+        coll = db[collection]
+
+        pattern = r'Category:(.*)'
+
+        def add_cat(category, content):
+            subcats = content[0]
+            art = content[1]
+
+            doc = {"$set": {'type': 'category',
+                    'pageid': category.pageid,
+                    'name': re.search(pattern, category.title()).group(1),
+                    'url': category.full_url(),
+                    'depth': category.depth},
+                    "$addToSet": {'subcats': {'$each': [x.pageid for x in subcats]},
+                                  'articles': {'$each': [x.pageid for x in art]}}}
+            coll.update_one({'pageid': category.pageid}, doc, upsert=True)
+
+            for subcat in subcats:
+                doc = {'$set': {'type': 'category',
+                        'pageid': subcat.pageid,
+                        'subcats': [],
+                        'articles': [],
+                        'name': re.search(pattern, subcat.title()).group(1),
+                        'url': subcat.full_url(),
+                        'depth': subcat.depth}}
+                coll.update_one({'type': 'category', 'pageid': subcat.pageid}, doc, upsert=True)
+
+            for a in art:
+                doc = {"$set": {'type': 'article',
+                        'pageid': a.pageid,
+                        'name': a.title(),
+                        'url': a.full_url()}}
+                coll.update_one({'type': 'article', 'pageid': a.pageid}, doc, upsert=True)
+
+        for cat, t in tqdm.tqdm(self.catContentDB.items()):
+            while True:
+                try:
+                    with Timeout(1500):
+                        add_cat(cat, t)
+                        break
+                except Timeout.Timeout:
+                    pywikibot.output('Operation timedout, trying again to add category.')
+                    continue
+                    
+class CategoryTreeRobot(object):
     """Robot to create tree overviews of the category structure.
     Parameters:
         * catTitle - The category which will be the tree's root.
@@ -310,11 +361,12 @@ class CategoryTreeRobot(object):
 
 
 if __name__ == '__main__':
-    filenames = [('category_depth_4.pickle', 4), ('category_depth_5.pickle', 5), ('category_depth_6.pickle', 6)]
-    for file, depth in filenames:
-        print('Building : %s' % file)
-        catDB = CategoryDatabase(rebuild=True, filename=file)
-        bot = CategoryTreeRobot('Scientific_disciplines', catDB, maxDepth=depth)
-        bot.run()
-        catDB.dump()
-    #catDB.dump_neo(host='localhost', user='neo4j', password='admin')
+    ###################################################################
+    #Initial bot running, or there would be import error while loading#
+    catDB = CategoryDatabase(rebuild=False)
+    bot = CategoryTreeRobot('Scientific_disciplines', catDB, maxDepth=1)
+    bot.run()
+    ######
+    catDB = CategoryDatabase(rebuild=False, filename='scientific_disciplines_depth_6.pickle')
+    catDB._load()  
+    catDB.dump_mongo(hostname='localhost', port=27017, database='wikidata', collection='knowledge_base')
