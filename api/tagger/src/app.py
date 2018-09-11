@@ -8,6 +8,9 @@ api = Api(app)
 
 
 class TextacyFormatting(object):
+    """
+    Format incoming data to be processed by textacy and extract keyterms.
+    """
     def __init__(self, data, lang=None):
         self.data = data
         self.lang = self._detect_lang(data['text']) if not lang else lang
@@ -49,7 +52,8 @@ class TextacyResponse(Resource):
                 keywords = tc.get_keyterms()
                 return {'keywords': keywords}, 200
             except Exception as e:
-                abort(400, e)        
+                abort(400, e)   
+
 
 if __name__ == '__main__':
     app.run(debug=True)
