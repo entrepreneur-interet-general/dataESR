@@ -5,15 +5,6 @@ import io
 import numpy as np
 from scipy.sparse import save_npz, load_npz
 
-def load_vectors(fname):
-    fin = io.open(fname, 'r', encoding='utf-8', newline='\n', errors='ignore')
-    n, d = map(int, fin.readline().split())
-    data = {}
-    for line in fin:
-        tokens = line.rstrip().split(' ')
-        data[tokens[0]] = map(float, tokens[1:])
-    return data
-
 class TextacyCorpusWikipedia(object):
     def __init__(self, lang, version='latest'):
         self.lang = lang
@@ -47,11 +38,11 @@ class TfidfEmbeddingVectorizer(object):
         self.doc_term_matrix = self.vectorizer.fit_transform(tokenized_docs)
 
     def transform(self, doc):
-        tokenized_doc = doc.to_terms_list(
-            ngrams=1, named_entities=True, as_strings=True)
+        tokenized_doc = [doc.to_terms_list(
+            ngrams=1, named_entities=True, as_strings=True)]
         tfidf_doc = self.vectorizer.transform(tokenized_doc)
         return np.array([
-            np.mean([self.w2v[w] * tfidf_doc[w]
+            np.mean([self.w2v[w] * tfidf_doc[:,self.vectorizer.vocabulary_terms[w]].toarray()[0]
                      for w in tokenized_doc if w in self.corpus.spacy_vocab] or
                     [np.zeros(self.dim)], axis=0)
         ])
@@ -68,9 +59,19 @@ class TfidfEmbeddingVectorizer(object):
                 raise Exception('tf-idf matrix not empty, set force=True to overwrite.')
         self.doc_term_matrix = load_npz(filename)
 
+    @staticmethod
+    def load_vectors(fname):
+        fin = io.open(fname, 'r', encoding='utf-8', newline='\n', errors='ignore')
+        n, d = map(int, fin.readline().split())
+        data = {}
+        for line in fin:
+            tokens = line.rstrip().split(' ')
+            data[tokens[0]] = map(float, tokens[1:])
+        return data
 
 
 if __name__ == '__main__':
     wp = TextacyCorpusWikipedia(u'en')
     t = TfidfEmbeddingVectorizer(None, wp.corpus)
+    fasttext_embeddings = t.load_vectors('wiki-news-300d-1M.vec')
 
