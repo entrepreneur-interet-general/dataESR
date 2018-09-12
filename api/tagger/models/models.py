@@ -2,6 +2,8 @@ from textacy.datasets import Wikipedia
 from textacy.io import split_records
 from textacy import Vectorizer, Corpus
 import io
+import numpy as np
+from scipy.sparse import save_npz, load_npz
 
 def load_vectors(fname):
     fin = io.open(fname, 'r', encoding='utf-8', newline='\n', errors='ignore')
@@ -28,13 +30,16 @@ class TfidfEmbeddingVectorizer(object):
     """
     Building tfidf weighted scheme out of a textacy Corpus.
     """
-    def __init__(self, w2v, corpus, total_doc=100):
+    def __init__(self, w2v, corpus, dim=300, total_doc=100):
+        self.dim = dim
         self.w2v = w2v
         self.corpus = corpus
         self.total_doc = total_doc
         self.vectorizer = Vectorizer(
                             apply_idf=True, norm='l2',
                             min_df=3, max_df=0.95)
+        self.doc_term_matrix = None
+
     def fit(self):
         tokenized_docs = (
                 doc.to_terms_list(ngrams=1, named_entities=True, as_strings=True)
@@ -45,7 +50,27 @@ class TfidfEmbeddingVectorizer(object):
         tokenized_doc = doc.to_terms_list(
             ngrams=1, named_entities=True, as_strings=True)
         tfidf_doc = self.vectorizer.transform(tokenized_doc)
+        return np.array([
+            np.mean([self.w2v[w] * tfidf_doc[w]
+                     for w in tokenized_doc if w in self.corpus.spacy_vocab] or
+                    [np.zeros(self.dim)], axis=0)
+        ])
+    
+    def save(self, filename):
+        if self.doc_term_matrix is None:
+            raise Exception('Nothing to save.')
+        else:
+            save_npz(filename, self.doc_term_matrix)
+    
+    def load(self, filename, force=False):
+        if self.doc_term_matrix is not None:
+            if not force:
+                raise Exception('tf-idf matrix not empty, set force=True to overwrite.')
+        self.doc_term_matrix = load_npz(filename)
+
+
 
 if __name__ == '__main__':
     wp = TextacyCorpusWikipedia(u'en')
     t = TfidfEmbeddingVectorizer(None, wp.corpus)
+
