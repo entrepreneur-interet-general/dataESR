@@ -10,12 +10,11 @@ class TextacyCorpusWikipedia(object):
         self.lang = lang
         self.wp = Wikipedia(lang, version=version)
         self.wp.download()
-        self.build_corpus()
 
-    def build_corpus(self):
-        texts = self.wp.records()
+    def build_corpus(self, size=-1):
+        texts = self.wp.records(limit=size)
         text_stream, metadata_stream = split_records(texts, 'text')
-        self.corpus = Corpus(self.lang, texts= text_stream, metadatas=metadata_stream)
+        self.corpus = Corpus(self.lang, texts=text_stream, metadatas=metadata_stream)
 
 class TfidfEmbeddingVectorizer(object):
     """
