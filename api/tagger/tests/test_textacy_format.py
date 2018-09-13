@@ -1,6 +1,7 @@
 import unittest
 from src.app import TextacyFormatting
 from operator import itemgetter
+import numpy as np
 
 class TestTextacyFormatting(unittest.TestCase):
     params = {
@@ -44,28 +45,28 @@ class TestTextacyFormatting(unittest.TestCase):
         self.__class__.params['method'] = 'textrank'
         tc = TextacyFormatting(self.__class__.params, lang=u'en')
         keywords = tc.get_keyterms()
-        assert keywords == [('treatment', 0.055888797213371644),
-                            ('continuum', 0.04564028843856736),
-                            ('description', 0.04147435059411628),
-                            ('particle', 0.040285831640575774),
-                            ('problem', 0.03652277091122243),
-                            ('lattice', 0.03556310973780484),
-                            ('equation', 0.0317939413740572),
-                            ('model', 0.030691218910060165),
-                            ('section', 0.027874555001248403),
-                            ('inference', 0.024670228221595807)]
+        assert set(zip(*keywords)[0]) == set(['treatment',
+                                            'continuum',
+                                            'description',
+                                            'particle',
+                                            'problem',
+                                            'lattice',
+                                            'equation',
+                                            'model',
+                                            'section',
+                                            'inference'])
     
     def test_singlerank(self):
         self.__class__.params['method'] = 'singlerank'
         tc = TextacyFormatting(self.__class__.params, lang=u'en')
         keywords = tc.get_keyterms()
-        assert keywords == [('time continuum', 0.12075620099061243),
-                            ('continuum space', 0.12072300449666701),
-                            ('continuum description', 0.11948703463619625),
-                            ('continuum limit', 0.10895909838974659),
-                            ('inference treatment', 0.0902938037965455),
-                            ('treatment', 0.05962939589508113),
-                            ('lattice', 0.044481858270253354),
-                            ('particle', 0.042016100170522444),
-                            ('time', 0.04191528319387767),
-                            ('space', 0.04188208669993223)]
+        assert set(zip(*keywords)[0]) == set(['time continuum',
+                                            'continuum space',
+                                            'continuum description',
+                                            'continuum limit',
+                                            'inference treatment',
+                                            'treatment',
+                                            'lattice',
+                                            'particle',
+                                            'time',
+                                            'space'])

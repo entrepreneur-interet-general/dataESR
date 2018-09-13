@@ -12,7 +12,7 @@ python:
   - "3.6"
 git:
   depth: false
-install: sudo pip install flake8 tox
+install: sudo pip install flake8 tox-travis
 script:
   - tox --workdir=$TRAVIS_BUILD_DIR/api/tagger
   - flake8 ./airflow
