@@ -14,7 +14,7 @@ git:
   depth: false
 install: sudo pip install flake8 tox
 script:
-  - cd api/tagger && tox
+  - tox --workdir=$TRAVIS_BUILD_DIR/api/tagger
   - flake8 ./airflow
   - sudo service postgresql stop
   - sudo make install
