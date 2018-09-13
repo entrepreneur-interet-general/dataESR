@@ -5,14 +5,9 @@ import io
 import numpy as np
 from scipy.sparse import save_npz, load_npz
 import logging
+import tqdm
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-# create a file handler
-handler = logging.FileHandler('models.log')
-handler.setLevel(logging.INFO)
-
+logging.basicConfig(level=logging.DEBUG,format='%(asctime)s :: %(levelname)s :: %(message)s')
 
 class TextacyCorpusWikipedia(object):
     def __init__(self, lang, version='latest'):
@@ -23,6 +18,7 @@ class TextacyCorpusWikipedia(object):
     def build_corpus(self, size=-1):
         texts = self.wp.records(limit=size)
         text_stream, metadata_stream = split_records(texts, 'text')
+        logging.info('building corpus...')
         self.corpus = Corpus(self.lang, texts=text_stream, metadatas=metadata_stream)
 
 
@@ -41,10 +37,10 @@ class TfidfEmbeddingVectorizer(object):
         self.doc_term_matrix = None
 
     def fit(self):
-        logger.info('Fitting vectorizer with corpus...')
+        logging.info('Fitting vectorizer with corpus...')
         tokenized_docs = (
                 doc.to_terms_list(ngrams=1, named_entities=True, as_strings=True)
-                for doc in self.corpus[:self.total_doc])
+                for doc in tqdm.tqdm(self.corpus[:self.total_doc]))
         self.doc_term_matrix = self.vectorizer.fit_transform(tokenized_docs)
 
     def transform(self, doc):
@@ -58,7 +54,7 @@ class TfidfEmbeddingVectorizer(object):
         ]).flatten()
     
     def save(self, filename):
-        logger.info('Saving doc term matrix in filename: ', filename)
+        logging.info('Saving doc term matrix in filename: %s', filename)
         if self.doc_term_matrix is None:
             raise Exception('Nothing to save.')
         else:
@@ -67,14 +63,14 @@ class TfidfEmbeddingVectorizer(object):
     def load(self, filename, force=False):
         if self.doc_term_matrix is not None:
             if not force:
-                logger.error('tf-idf matrix not empty, set force=True to overwrite.')
+                logging.error('tf-idf matrix not empty, set force=True to overwrite.')
                 raise Exception('tf-idf matrix not empty, set force=True to overwrite.')
-        logger.info('Loading doc term matrix from filename: ', filename)
+        logging.info('Loading doc term matrix from filename: ', filename)
         self.doc_term_matrix = load_npz(filename)
 
     @staticmethod
     def load_vectors(fname):
-        logger.info('Reading vectors from file: ', fname)
+        logging.info('Reading vectors from file: %s', fname)
         fin = io.open(fname, 'r', encoding='utf-8', newline='\n', errors='ignore')
         n, d = map(int, fin.readline().split())
         data = {}
@@ -86,6 +82,8 @@ class TfidfEmbeddingVectorizer(object):
 
 if __name__ == '__main__':
     wp = TextacyCorpusWikipedia(u'en')
-    t = TfidfEmbeddingVectorizer(None, wp.corpus)
-    fasttext_embeddings = t.load_vectors('wiki-news-300d-1M.vec')
-
+    wp.build_corpus(size=10)
+    w2v = TfidfEmbeddingVectorizer.load_vectors('wiki-news-300d-1M.vec')
+    t = TfidfEmbeddingVectorizer(w2v, wp.corpus, total_doc=10)
+    t.fit()
+    t.save('10000_wiki.npz')
