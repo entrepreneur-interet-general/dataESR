@@ -4,6 +4,15 @@ from textacy import Vectorizer, Corpus
 import io
 import numpy as np
 from scipy.sparse import save_npz, load_npz
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# create a file handler
+handler = logging.FileHandler('models.log')
+handler.setLevel(logging.INFO)
+
 
 class TextacyCorpusWikipedia(object):
     def __init__(self, lang, version='latest'):
@@ -15,6 +24,7 @@ class TextacyCorpusWikipedia(object):
         texts = self.wp.records(limit=size)
         text_stream, metadata_stream = split_records(texts, 'text')
         self.corpus = Corpus(self.lang, texts=text_stream, metadatas=metadata_stream)
+
 
 class TfidfEmbeddingVectorizer(object):
     """
@@ -31,6 +41,7 @@ class TfidfEmbeddingVectorizer(object):
         self.doc_term_matrix = None
 
     def fit(self):
+        logger.info('Fitting vectorizer with corpus...')
         tokenized_docs = (
                 doc.to_terms_list(ngrams=1, named_entities=True, as_strings=True)
                 for doc in self.corpus[:self.total_doc])
@@ -41,12 +52,13 @@ class TfidfEmbeddingVectorizer(object):
             ngrams=1, named_entities=True, as_strings=True)]
         tfidf_doc = self.vectorizer.transform(tokenized_doc)
         return np.array([
-            np.mean([self.w2v[w] * tfidf_doc[:,self.vectorizer.vocabulary_terms[w]].toarray()[0]
-                     for w in tokenized_doc if w in self.corpus.spacy_vocab] or
+            np.mean([self.w2v[w] * tfidf_doc[:, self.vectorizer.vocabulary_terms[w]].toarray()[0]
+                     for w in tokenized_doc[0] if w in self.corpus.spacy_vocab] or
                     [np.zeros(self.dim)], axis=0)
-        ])
+        ]).flatten()
     
     def save(self, filename):
+        logger.info('Saving doc term matrix in filename: ', filename)
         if self.doc_term_matrix is None:
             raise Exception('Nothing to save.')
         else:
@@ -55,11 +67,14 @@ class TfidfEmbeddingVectorizer(object):
     def load(self, filename, force=False):
         if self.doc_term_matrix is not None:
             if not force:
+                logger.error('tf-idf matrix not empty, set force=True to overwrite.')
                 raise Exception('tf-idf matrix not empty, set force=True to overwrite.')
+        logger.info('Loading doc term matrix from filename: ', filename)
         self.doc_term_matrix = load_npz(filename)
 
     @staticmethod
     def load_vectors(fname):
+        logger.info('Reading vectors from file: ', fname)
         fin = io.open(fname, 'r', encoding='utf-8', newline='\n', errors='ignore')
         n, d = map(int, fin.readline().split())
         data = {}
