@@ -12,7 +12,7 @@ python:
   - "3.6"
 git:
   depth: false
-install: sudo pip install flake8
+install: sudo pip install flake8 tox
 script:
   - cd api/tagger && tox
   - flake8 ./airflow
