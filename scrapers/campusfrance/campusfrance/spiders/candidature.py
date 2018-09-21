@@ -30,6 +30,10 @@ class CandidatureSpider(Spider):
         yield Request('http://chercheurs.campusfrance.org/CandidatureAnonyme/recherche-externe', self.parse)
 
     def parse_page_error(self, p):
+        '''
+        Si jamais il n'y a aucun resultat de trouver ou qu'une erreur
+        s'est produite, on reinitilise le driver.
+        '''
         vide = "produit aucun".decode('utf8') \
                 in self.driver.page_source
         non_vide = "ponse(s)".decode('utf8') \
@@ -52,6 +56,10 @@ class CandidatureSpider(Spider):
             return True
     
     def parse_select(self, elements):
+        '''
+        Cherche l'ensemble des valeurs des options disponibles dans
+        l'element de choix de la page de recherche.
+        '''
         return [v.get_attribute('value') for v in elements[1:]]
 
     def parse_list_page(self, combinaison, multipays=False):
@@ -233,6 +241,11 @@ class CandidatureSpider(Spider):
     #               len(self.combinaisons))
 
     def construct_permutations(self, **kwargs):
+        '''
+        On construit toutes les permutations possibles pour
+        la recherche afin d'etre sur de pas depasser la limite
+        de resultats.
+        '''
         for i in kwargs['programme']:
             for j in kwargs['domaine']:
                 for y in kwargs['annee_init']:
@@ -247,6 +260,10 @@ class CandidatureSpider(Spider):
                 len(self.combinaisons))
 
     def parse(self, response):
+        '''
+        Parse la réponse, selectionne à partir de l'XPath
+        les boutons de selection pour la recherche
+        '''
         items = []
         self.driver.get(response.url)
         self.log('Starting to fill form')
@@ -263,13 +280,18 @@ class CandidatureSpider(Spider):
         pdomaine = domaine.find_elements_by_tag_name("option")
         pannee_init = annee_init.find_elements_by_tag_name("option")
 
-        #les prog avec plus de 300 resultats et ceux qui restent
+        #les programmes avec plus de 300 resultats et ceux qui restent
         #On calcule toutes les permutations seulement pour ceux qui
-        #depassent les 300 resultats
-        prog_300 = ['6', '9', '10', '40', '47'] 
+        #depassent les 300 resultats pour gagner du temps.
+        prog_300 = ['6', '9', '10', '40', '47']
+
+        # Les cas multipays. On aurait pu les trouver directement
+        # En regardant dans le programme la présence de "multi".
         multi_pays = ['10007501', '48', '10007500', '10006500']
+
         self.log('Constructing permutations')
         self.construct_permutations(
+            #programme=self.parse_select
             programme=prog_300,
             #programme=multi_pays,
             domaine=self.parse_select(pdomaine),
@@ -298,6 +320,14 @@ class CandidatureSpider(Spider):
         return
 
     def trigger_select(self, p):
+        '''
+        Change les valeurs dans les barres "programme",
+        "domaine", et "annee en cours", et simule un click sur
+        le bouton 'recherche'.
+        On fait une pause de 2sec car le site avait tendance à ne pas
+        prendre en compte les valeurs selectionnées dans la recherche
+        si celle ci se passait trop vite.
+        '''
         programme = self.driver.find_element_by_xpath(
             "//span[1]/div[2]/div/div/div[2]/select")
         domaine = self.driver.find_element_by_xpath(
@@ -321,6 +351,10 @@ class CandidatureSpider(Spider):
         recherche.click()
 
     def reinitialize_driver(self):
+        '''
+        Réinitialise le driver.
+        Nécessaire car un simple retour ne fonctionnait pas.
+        '''
         self.log('Closing current driver')
         self.log('Reinitializing driver')
         #self.driver.delete_all_cookies()

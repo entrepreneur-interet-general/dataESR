@@ -20,3 +20,7 @@ Un outil pratique pour débugger un site et regarder comment un spider réagit s
 ```
 scrapy shell
 ```
+
+## Scraping Campus France
+
+Le scraping de ce site utilise `selenium`. Afin d'améliorer la vitesse de scraping, on différencie les programmes qui peuvent être scrapés en une requête et ceux qui nécessitent plusieurs requêtes car dépassant la limite de la recherche (cf la liste `prog_300` dans le fichier `candidature.py`).
