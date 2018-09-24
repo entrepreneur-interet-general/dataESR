@@ -6,11 +6,31 @@ import numpy as np
 from scipy.sparse import save_npz, load_npz
 import logging
 import tqdm
+from category import CategoryDatabase, CategoryTreeRobot
 
 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s :: %(levelname)s :: %(message)s')
 
-class TextacyCorpusWikipedia(object):
-    def __init__(self, lang, version='latest'):
+class KnowledgeBase(object):
+    """
+    Build knowledge base from a dump.
+    catDB : - catContentDB: dict[category] = (subcatset, articleset)
+    """
+    def __init__(self, filename):
+        self.fn = filename
+        self.run()
+
+    def run(self):
+        catDB = CategoryDatabase(rebuild=False)
+        bot = CategoryTreeRobot('Scientific_disciplines', catDB, maxDepth=1)
+        bot.run()
+        ######
+        catDB = CategoryDatabase(rebuild=False, filename=self.fn)
+        catDB._load()
+        self.catDB = catDB
+
+class TextacyCorpusWikipedia(KnowledgeBase):
+    def __init__(self, lang, filename, version='latest'):
+        super(KnowledgeBase, self).__init__(filename)
         self.lang = lang
         self.wp = Wikipedia(lang, version=version)
         self.wp.download()
