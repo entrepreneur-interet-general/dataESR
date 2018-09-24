@@ -291,8 +291,8 @@ class CandidatureSpider(Spider):
 
         self.log('Constructing permutations')
         self.construct_permutations(
-            #programme=self.parse_select
-            programme=prog_300,
+            programme=self.parse_select(pprogramme),
+            #programme=prog_300,
             #programme=multi_pays,
             domaine=self.parse_select(pdomaine),
             annee_init=self.parse_select(pannee_init)
