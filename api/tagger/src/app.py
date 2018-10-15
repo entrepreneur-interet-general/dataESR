@@ -1,9 +1,11 @@
 from flask import Flask, json, request, abort
 from flask_restplus import Resource, Api
+from models import FastTextModel
 import textacy
 import textacy.keyterms as tck
 
 app = Flask(__name__)
+app.config.from_object('Config.Config')
 api = Api(app)
 
 
@@ -54,6 +56,19 @@ class TextacyResponse(Resource):
             except Exception as e:
                 abort(400, e)   
 
+
+@api.route('/predictions_fasttext', methods=["POST"])
+class FastTextResponse(Resource):
+    def __init__(self):
+        self.model = FastTextModel(app.config["fastText_file"])
+    def post(self):
+        data = request.json
+        k = int(request.args.get('k')) if request.args.get('k') else 1
+        threshold = float(request.args.get('threshold')
+                    ) if request.args.get('threshold') else 0.0
+        queries = json.loads(request.data)
+        response = [self.model.make_prediction(q, k, threshold) for q in queries]
+        return json.dumps(response)
 
 if __name__ == '__main__':
     app.run(debug=True)

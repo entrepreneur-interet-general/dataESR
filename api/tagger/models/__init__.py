@@ -1,1 +1,1 @@
-from models import TfidfEmbeddingVectorizer, TextacyCorpusWikipedia
+from models import TfidfEmbeddingVectorizer, TextacyCorpusWikipedia, FastTextModel

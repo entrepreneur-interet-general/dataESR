@@ -6,6 +6,7 @@ import numpy as np
 from scipy.sparse import save_npz, load_npz
 import logging
 import tqdm
+import fastText
 from category import CategoryDatabase, CategoryTreeRobot
 
 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s :: %(levelname)s :: %(message)s')
@@ -100,6 +101,17 @@ class TfidfEmbeddingVectorizer(object):
         return data
 
 
+class FastTextModel(object):
+    def __init__(self, filename):
+        self.model = fastText.load_model(filename)
+    def make_prediction(self, query, k, threshold):
+        """
+        - k (int):  Number of most likely classes returned (default: 1)
+        - threshold (float): Filter classes with a probability below threshold (default: 0.0)
+        """
+        labels, probas = self.model.predict(query, k, threshold)
+        return [{"label": l, "probas": p} for l, p in zip(labels, probas)]
+    
 if __name__ == '__main__':
     wp = TextacyCorpusWikipedia(u'en')
     wp.build_corpus(size=10)
