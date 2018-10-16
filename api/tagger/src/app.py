@@ -62,13 +62,23 @@ class FastTextResponse(Resource):
     def __init__(self):
         self.model = FastTextModel(app.config["fastText_file"])
     def post(self):
-        data = request.json
         k = int(request.args.get('k')) if request.args.get('k') else 1
         threshold = float(request.args.get('threshold')
                     ) if request.args.get('threshold') else 0.0
-        queries = json.loads(request.data)
+        queries = request.json
         response = [self.model.make_prediction(q, k, threshold) for q in queries]
         return json.dumps(response)
+
+
+@api.route('/entity_linking', methods=["POST"])
+class Wikipedia2VecResponse(Resource):
+    def __init__(self):
+        self.models = {}
+    def post(self):
+        lang = request.args.get('lang') if request.args.get('lang') else 'en'
+        queries = request.json
+        
+
 
 if __name__ == '__main__':
     app.run(debug=True)

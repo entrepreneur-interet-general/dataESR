@@ -1,4 +1,4 @@
-Version supportée : `python 2.7`
+Version supportée : `python 3.6`
 
 # Lancer
 Pour lancer l'api :
