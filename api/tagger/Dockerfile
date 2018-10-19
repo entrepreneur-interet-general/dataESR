@@ -24,7 +24,6 @@ RUN apt-get update -yqq \
     libsasl2-dev \
     libssl-dev \
     libffi-dev \
-    build-essential \
     libblas-dev \
     liblapack-dev \
     libpq-dev
