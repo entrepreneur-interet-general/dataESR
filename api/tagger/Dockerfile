@@ -34,8 +34,9 @@ RUN git clone https://github.com/facebookresearch/fastText.git /tmp/fastText && 
     cd / && \
     make
 
-#RUN pip install -r requirements.txt
-RUN pip install spacy
+ENV PYTHONPATH "${PYTHONPATH}:/app"
+
+RUN pip install -r requirements.txt
 RUN python -m spacy download en_vectors_web_lg
 RUN python -m spacy download fr
 ENTRYPOINT ["python"]
