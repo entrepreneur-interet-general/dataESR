@@ -29,10 +29,9 @@ RUN apt-get update -yqq \
     libpq-dev
 
 RUN git clone https://github.com/facebookresearch/fastText.git /tmp/fastText && \
-    rm -rf /tmp/fastText/.git* && \
-    mv /tmp/fastText/* / && \
-    cd / && \
-    make
+    cd /tmp/fastText && \
+    pip install . && \
+    cd /app
 
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
