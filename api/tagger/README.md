@@ -8,12 +8,15 @@ Version supportée : `python 2.7`(`python 3.6`)
 
 2 modèles ont été entraîné permettant à un texte d'être annoter à partir d'une ontologie scientifique que repose soit sur celle du `scopus`, ou soit sur celle de la bibliothèque `PascalFrancis`.
 
+### API
+
+#### POST /predict_fasttext
+
 ### Scopus
 
 ### PascalFrancis
 
 ## Lier du texte à des entités Wikipedia
-
 
 ## Pour lancer le service
 

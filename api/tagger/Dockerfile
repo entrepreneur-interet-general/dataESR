@@ -1,4 +1,4 @@
-FROM ubuntu:trusty
+FROM python:2.7
 
 EXPOSE 5000
 COPY . /app

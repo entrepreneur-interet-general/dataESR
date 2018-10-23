@@ -7,31 +7,33 @@ from scipy.sparse import save_npz, load_npz
 import logging
 import tqdm
 import fastText
-from category import CategoryDatabase, CategoryTreeRobot
+import celery
+# from category import CategoryDatabase, CategoryTreeRobot
+from wikipedia2vec import Wikipedia2Vec
 
 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s :: %(levelname)s :: %(message)s')
 
-class KnowledgeBase(object):
-    """
-    Build knowledge base from a dump.
-    catDB : - catContentDB: dict[category] = (subcatset, articleset)
-    """
-    def __init__(self, filename):
-        self.fn = filename
-        self.run()
+# class KnowledgeBase(object):
+#     """
+#     Build knowledge base from a dump.
+#     catDB : - catContentDB: dict[category] = (subcatset, articleset)
+#     """
+#     def __init__(self, filename):
+#         self.fn = filename
+#         self.run()
 
-    def run(self):
-        catDB = CategoryDatabase(rebuild=False)
-        bot = CategoryTreeRobot('Scientific_disciplines', catDB, maxDepth=1)
-        bot.run()
-        ######
-        catDB = CategoryDatabase(rebuild=False, filename=self.fn)
-        catDB._load()
-        self.catDB = catDB
+#     def run(self):
+#         catDB = CategoryDatabase(rebuild=False)
+#         bot = CategoryTreeRobot('Scientific_disciplines', catDB, maxDepth=1)
+#         bot.run()
+#         ######
+#         catDB = CategoryDatabase(rebuild=False, filename=self.fn)
+#         catDB._load()
+#         self.catDB = catDB
 
-class TextacyCorpusWikipedia(KnowledgeBase):
+class TextacyCorpusWikipedia(object):
     def __init__(self, lang, filename, version='latest'):
-        super(KnowledgeBase, self).__init__(filename)
+        #super(KnowledgeBase, self).__init__(filename)
         self.lang = lang
         self.wp = Wikipedia(lang, version=version)
         self.wp.download()
@@ -103,14 +105,31 @@ class TfidfEmbeddingVectorizer(object):
 
 class FastTextModel(object):
     def __init__(self, filename):
+        print('Loading fastText model...')
         self.model = fastText.load_model(filename)
     def make_prediction(self, query, k, threshold):
         """
         - k (int):  Number of most likely classes returned (default: 1)
         - threshold (float): Filter classes with a probability below threshold (default: 0.0)
         """
-        labels, probas = self.model.predict(query, k, threshold)
+        text = query['text']
+        print(text, k, threshold)
+        labels, probas = self.model.predict(text, k, threshold)
+        print(labels)
         return [{"label": l, "probas": p} for l, p in zip(labels, probas)]
+    def build_context_vector(self, keywords):
+        words = keywords.split()
+        return self.model.get_sentence_vector(words)
+
+
+class Wikipedia2VecModel(object):
+    def __init__(self, lang, filename):
+        self.lang = lang
+        self.model = Wikipedia2Vec.load(filename)
+    def link_text(self, text):
+        pass
+
+
     
 if __name__ == '__main__':
     wp = TextacyCorpusWikipedia(u'en')

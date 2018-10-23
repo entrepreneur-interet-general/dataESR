@@ -10,3 +10,5 @@ tox-travis
 enum34
 spacy
 wikipedia2vec
+Cython
+celery

@@ -1,6 +1,6 @@
 import unittest
 from textacy import Doc, Corpus
-from models import TfidfEmbeddingVectorizer
+from tagger.models import TfidfEmbeddingVectorizer
 import numpy as np
 import os
 
