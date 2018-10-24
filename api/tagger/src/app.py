@@ -16,6 +16,19 @@ Downloader(app)
 celery = Celery(app)
 #celery.conf.update(app.config)
 
+
+#preloading models
+try:
+    model_fasttext_scopus = FastTextModel(app.config["FASTTEXT_FILE_MODEL_SCOPUS"])
+#    model_fasttext_pf = FastTextModel(app.config["FASTTEXT_FILE_MODEL_PF"])
+except:
+    raise Exception("Couldn't preload fastText models")
+
+MAPPING_MODELS = {
+    'scopus': model_fasttext_scopus
+    #'pf': model_fasttext_pf
+}
+
 class TextacyFormatting(object):
     """
     Format incoming data to be processed by textacy and extract keyterms.
@@ -69,18 +82,17 @@ class TextacyResponse(Resource):
 class FastTextResponse(Resource):
     def post(self):
         data = request.json
-        # formatting data to extract keywords
-        tc = TextacyFormatting(data, lang=data.get('lang'))
-        keywords = tc.get_keyterms(params=data.get('params'))
+        try:
+            app.logger.info(data)
+            m = MAPPING_MODELS[data['model']]
 
-        model = FastTextModel(app.config["FASTTEXT_FILE_MODEL_SCOPUS"])
-
-        k = int(request.args.get('k')) if request.args.get('k') else 1
-        threshold = float(request.args.get('threshold')
-                    ) if request.args.get('threshold') else 0.0
-        queries = [{'text': s[0]} for s in keywords]
-        response = [model.make_prediction(q, k, threshold) for q in queries]
-        return json.dumps(response)
+            k = int(data.get('k')) if data.get('k') else 1
+            threshold = float(request.args.get('threshold')
+                        ) if request.args.get('threshold') else 0.0
+            labels = m.make_prediction(data, k, threshold)
+            return json.dumps({"labels": labels})
+        except Exception as e:
+            abort(400, e)
 
 
 @api.route('/entity_linking', methods=["POST"])
@@ -88,6 +100,9 @@ class Wikipedia2VecResponse(Resource):
     def __init__(self):
         self.models = {}
     def post(self):
+        # formatting data to extract keywords
+        tc = TextacyFormatting(data, lang=data.get('lang'))
+        keywords = tc.get_keyterms(params=data.get('params'))
         lang = request.args.get('lang') if request.args.get('lang') else 'en'
         queries = request.json
 
