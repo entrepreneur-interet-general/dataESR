@@ -1,4 +1,4 @@
-from flask import Flask, json, request, abort
+from flask import Flask, jsonify, json, request, abort
 from flask_restplus import Resource, Api
 from models import FastTextModel
 from downloader import Downloader
@@ -83,14 +83,15 @@ class FastTextResponse(Resource):
     def post(self):
         data = request.json
         try:
-            app.logger.info(data)
             m = MAPPING_MODELS[data['model']]
-
             k = int(data.get('k')) if data.get('k') else 1
-            threshold = float(request.args.get('threshold')
-                        ) if request.args.get('threshold') else 0.0
-            labels = m.make_prediction(data, k, threshold)
-            return json.dumps({"labels": labels})
+            threshold = float(data.get('threshold')
+                        ) if data.get('threshold') else 0.0
+            labels = map(lambda x: {'label': x['label'].replace('__label__', '')
+                                             .replace('_', ' '),
+                                     'probas': x['probas']},
+                        m.make_prediction(data, k, threshold))
+            return jsonify({"labels": labels})
         except Exception as e:
             abort(400, e)
 
