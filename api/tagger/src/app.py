@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, json, request, abort
 from flask_restplus import Resource, Api
-from models import FastTextModel
+from models.models import FastTextModel, Wikipedia2VecModel
 from downloader import Downloader
 from celery import Celery
 import os
@@ -16,16 +16,18 @@ Downloader(app)
 celery = Celery(app)
 #celery.conf.update(app.config)
 
-
 #preloading models
 try:
     model_fasttext_scopus = FastTextModel(app.config["FASTTEXT_FILE_MODEL_SCOPUS"])
+    wikipedia2vec_models_en = Wikipedia2VecModel(
+        'en', app.config["WIKIPEDIA2VEC_EMBEDDINGS_EN"], app.config["WIKIPEDIA2VEC_DIC_EN"], app.config["WIKIPEDIA2VEC_MENTION_EN"])
 #    model_fasttext_pf = FastTextModel(app.config["FASTTEXT_FILE_MODEL_PF"])
-except:
-    raise Exception("Couldn't preload fastText models")
+except Exception as e :
+    app.logger.error(e)
 
 MAPPING_MODELS = {
-    'scopus': model_fasttext_scopus
+    'scopus': model_fasttext_scopus,
+    'wiki2vec_en': wikipedia2vec_models_en
     #'pf': model_fasttext_pf
 }
 
@@ -82,30 +84,32 @@ class TextacyResponse(Resource):
 class FastTextResponse(Resource):
     def post(self):
         data = request.json
+        app.logger.debug('test')
         try:
             m = MAPPING_MODELS[data['model']]
             k = int(data.get('k')) if data.get('k') else 1
             threshold = float(data.get('threshold')
                         ) if data.get('threshold') else 0.0
-            labels = map(lambda x: {'label': x['label'].replace('__label__', '')
+            labels = list(map(lambda x: {'label': x['label'].replace('__label__', '')
                                              .replace('_', ' '),
                                      'probas': x['probas']},
-                        m.make_prediction(data, k, threshold))
+                        m.make_prediction(data, k, threshold)))
             return jsonify({"labels": labels})
         except Exception as e:
             abort(400, e)
 
 
-@api.route('/entity_linking', methods=["POST"])
+@api.route('/entity_linking')
 class Wikipedia2VecResponse(Resource):
-    def __init__(self):
-        self.models = {}
     def post(self):
-        # formatting data to extract keywords
-        tc = TextacyFormatting(data, lang=data.get('lang'))
-        keywords = tc.get_keyterms(params=data.get('params'))
-        lang = request.args.get('lang') if request.args.get('lang') else 'en'
-        queries = request.json
+        data = request.json
+        try:
+            model = MAPPING_MODELS['wiki2vec_en']
+            app.logger.debug(data['text'])
+            response = model.detect_mentions(data['text'])
+            return jsonify(response)
+        except Exception as e:
+            abort(400, e)
 
 
 @api.route('/restart_downloader')

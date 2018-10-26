@@ -10,6 +10,9 @@ import fastText
 import celery
 # from category import CategoryDatabase, CategoryTreeRobot
 from wikipedia2vec import Wikipedia2Vec
+from wikipedia2vec.dictionary import Dictionary
+from wikipedia2vec.mention_db import MentionDB
+from wikipedia2vec.utils.tokenizer.regexp_tokenizer import RegexpTokenizer
 
 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s :: %(levelname)s :: %(message)s')
 
@@ -31,7 +34,7 @@ logging.basicConfig(level=logging.DEBUG,format='%(asctime)s :: %(levelname)s :: 
 #         catDB._load()
 #         self.catDB = catDB
 
-class TextacyCorpusWikipedia(object):
+class TextacyCorpusWikipedia:
     def __init__(self, lang, filename, version='latest'):
         #super(KnowledgeBase, self).__init__(filename)
         self.lang = lang
@@ -45,7 +48,7 @@ class TextacyCorpusWikipedia(object):
         self.corpus = Corpus(self.lang, texts=text_stream, metadatas=metadata_stream)
 
 
-class TfidfEmbeddingVectorizer(object):
+class TfidfEmbeddingVectorizer:
     """
     Building tfidf weighted scheme out of a textacy Corpus.
     """
@@ -103,7 +106,7 @@ class TfidfEmbeddingVectorizer(object):
         return data
 
 
-class FastTextModel(object):
+class FastTextModel:
     def __init__(self, filename):
         print('Loading fastText model...')
         self.model = fastText.load_model(filename)
@@ -122,15 +125,26 @@ class FastTextModel(object):
         return self.model.get_sentence_vector(words)
 
 
-class Wikipedia2VecModel(object):
-    def __init__(self, lang, filename):
+class Wikipedia2VecModel:
+    def __init__(self, lang, model, dic, mention_db):
         self.lang = lang
-        self.model = Wikipedia2Vec.load(filename)
-    def link_text(self, text):
-        pass
+        self.model = Wikipedia2Vec.load(model)
+        self.dic = Dictionary.load(dic)
+        self.mention_db = MentionDB.load(mention_db, self.dic)
+    def detect_mentions(self, text):
+        print("Detecting mentions...")
+        print(text)
+        tokenizer = RegexpTokenizer()
+        tokens = tokenizer.tokenize(text)
+        response = []
+        for mention in self.mention_db.detect_mentions(text, tokens):
+            response.append({
+                "text": mention.text,
+                "entity": mention.entity.title
+            })
+        return response
 
 
-    
 if __name__ == '__main__':
     wp = TextacyCorpusWikipedia(u'en')
     wp.build_corpus(size=10)
