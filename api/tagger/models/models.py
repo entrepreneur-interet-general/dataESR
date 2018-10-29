@@ -140,7 +140,8 @@ class Wikipedia2VecModel:
             response.append({
                 "text": mention.text,
                 "entity": mention.entity.title,
-                "url": "https://en.wikipedia.org/wiki/" + mention.entity.title.replace(' ', '_')
+                "url": "https://{}.wikipedia.org/wiki/".format(self.lang) + \
+                    mention.entity.title.replace(' ', '_')
             })
         return response
 
