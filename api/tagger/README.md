@@ -18,6 +18,8 @@ Version supportée : `python 2.7`(`python 3.6`)
 
 ## Lier du texte à des entités Wikipedia
 
+### API 
+
 ### POST /entity_linking
 
 #### Example request :
