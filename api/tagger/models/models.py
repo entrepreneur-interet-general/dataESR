@@ -133,14 +133,14 @@ class Wikipedia2VecModel:
         self.mention_db = MentionDB.load(mention_db, self.dic)
     def detect_mentions(self, text):
         print("Detecting mentions...")
-        print(text)
         tokenizer = RegexpTokenizer()
         tokens = tokenizer.tokenize(text)
         response = []
         for mention in self.mention_db.detect_mentions(text, tokens):
             response.append({
                 "text": mention.text,
-                "entity": mention.entity.title
+                "entity": mention.entity.title,
+                "url": "https://en.wikipedia.org/wiki/" + mention.entity.title.replace(' ', '_')
             })
         return response
 
