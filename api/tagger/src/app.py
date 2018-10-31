@@ -68,13 +68,13 @@ class TextacyFormatting(object):
 class TextacyResponse(Resource):
     def post(self):
         data = request.json
-        app.logger.debug(request.json)
+        params = data.get('params')
         if data is None or 'text' not in data:
             abort(400, "No parameter text was founds. Default JSON input is : {'text':...}")
         else:
             tc = TextacyFormatting(data, lang=data.get('lang'))
             try:
-                keywords = tc.get_keyterms()
+                keywords = tc.get_keyterms(params=params)
                 return {'keywords': keywords}, 200
             except Exception as e:
                 abort(400, e)   
@@ -105,7 +105,6 @@ class Wikipedia2VecResponse(Resource):
         data = request.json
         try:
             model = MAPPING_MODELS['wiki2vec_en']
-            app.logger.debug(data['text'])
             response = model.detect_mentions(data['text'])
             return jsonify(response)
         except Exception as e:
