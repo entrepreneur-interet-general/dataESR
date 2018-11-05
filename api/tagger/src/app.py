@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.config.from_pyfile('config.py')
 api = Api(app)
 
-Downloader(app)
+#Downloader(app)
 celery = Celery(app)
 #celery.conf.update(app.config)
 
@@ -20,7 +20,7 @@ celery = Celery(app)
 try:
     model_fasttext_scopus = FastTextModel(app.config["FASTTEXT_FILE_MODEL_SCOPUS"])
     wikipedia2vec_models_en = Wikipedia2VecModel(
-        'en', app.config["WIKIPEDIA2VEC_EMBEDDINGS_EN"], app.config["WIKIPEDIA2VEC_DIC_EN"], app.config["WIKIPEDIA2VEC_MENTION_EN"])
+        'en', app.config["WIKIPEDIA2VEC_DIC_EN"], app.config["WIKIPEDIA2VEC_MENTION_EN"])
 #    model_fasttext_pf = FastTextModel(app.config["FASTTEXT_FILE_MODEL_PF"])
 except Exception as e :
     app.logger.error(e)

@@ -126,9 +126,8 @@ class FastTextModel:
 
 
 class Wikipedia2VecModel:
-    def __init__(self, lang, model, dic, mention_db):
+    def __init__(self, lang, dic, mention_db):
         self.lang = lang
-        self.model = Wikipedia2Vec.load(model)
         self.dic = Dictionary.load(dic)
         self.mention_db = MentionDB.load(mention_db, self.dic)
     def detect_mentions(self, text):
