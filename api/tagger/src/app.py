@@ -12,7 +12,6 @@ app = Flask(__name__)
 app.config.from_pyfile('config.py')
 api = Api(app)
 
-#Downloader(app)
 celery = Celery(app)
 #celery.conf.update(app.config)
 
@@ -21,14 +20,14 @@ try:
     model_fasttext_scopus = FastTextModel(app.config["FASTTEXT_FILE_MODEL_SCOPUS"])
     wikipedia2vec_models_en = Wikipedia2VecModel(
         'en', app.config["WIKIPEDIA2VEC_DIC_EN"], app.config["WIKIPEDIA2VEC_MENTION_EN"])
-#    model_fasttext_pf = FastTextModel(app.config["FASTTEXT_FILE_MODEL_PF"])
+    model_fasttext_pf = FastTextModel(app.config["FASTTEXT_FILE_MODEL_PF"])
 except Exception as e :
     app.logger.error(e)
 
 MAPPING_MODELS = {
     'scopus': model_fasttext_scopus,
-    'wiki2vec_en': wikipedia2vec_models_en
-    #'pf': model_fasttext_pf
+    'wiki2vec_en': wikipedia2vec_models_en,
+    'pf': model_fasttext_pf
 }
 
 class TextacyFormatting(object):

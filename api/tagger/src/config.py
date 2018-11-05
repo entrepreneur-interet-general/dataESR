@@ -8,7 +8,6 @@ WIKIPEDIA2VEC_DIC_EN = '/Users/MACSAMI/Documents/Github/dataESR/api/tagger/model
 WIKIPEDIA2VEC_MENTION_EN = '/Users/MACSAMI/Documents/Github/dataESR/api/tagger/models/wikipedia2vec_disambi_mention.pkl'
 WIKIPEDIA2VEC_EMBEDDINGS_EN = '/Users/MACSAMI/Documents/Github/dataESR/api/tagger/models/wikipedia2vec_embeddings'
 
-URL_DATA = ''
 
 logging.basicConfig(
     filename=os.getenv('SERVICE_LOG', 'tagger.log'),

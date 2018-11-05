@@ -43,5 +43,7 @@ RUN tar zxvf /app/src/data/models.tar.gz -C /app/src/data/ && \
     python -m spacy download en_vectors_web_lg && \
     python -m spacy download fr
 
-ENTRYPOINT ["PYTHONPATH='.'", "python"]
+ENV PYTHONPATH "${PYTHONPATH}:/app"
+
+ENTRYPOINT ["python"]
 CMD ["src/app.py"]
