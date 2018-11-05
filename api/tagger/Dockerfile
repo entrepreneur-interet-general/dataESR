@@ -1,4 +1,4 @@
-FROM python:2.7
+FROM python:3.6
 
 EXPOSE 5000
 COPY . /app
@@ -31,12 +31,17 @@ RUN apt-get update -yqq \
 RUN git clone https://github.com/facebookresearch/fastText.git /tmp/fastText && \
     cd /tmp/fastText && \
     pip install . && \
-    cd /app
+    cd /app && \
+    mkdir -p /app/src/data
 
-ENV PYTHONPATH "${PYTHONPATH}:/app"
+ADD https://s3.amazonaws.com/tagger-eig/models/models.tar.gz /app/src/data
 
-RUN pip install -r requirements.txt
-RUN python -m spacy download en_vectors_web_lg
-RUN python -m spacy download fr
-ENTRYPOINT ["python"]
+RUN tar zxvf /app/src/data/models.tar.gz -C /app/src/data/ && \
+    rm -f /app/src/data/models.tar.gz && \
+    cd /app && \
+    pip install -r requirements.txt && \
+    python -m spacy download en_vectors_web_lg && \
+    python -m spacy download fr
+
+ENTRYPOINT ["PYTHONPATH='.'", "python"]
 CMD ["src/app.py"]
