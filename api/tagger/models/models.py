@@ -136,13 +136,14 @@ class Wikipedia2VecModel:
         tokens = tokenizer.tokenize(text)
         response = []
         for mention in self.mention_db.detect_mentions(text, tokens):
-            if mention not in response:
-                response.append({
-                    "text": mention.text,
-                    "entity": mention.entity.title,
-                    "url": "https://{}.wikipedia.org/wiki/".format(self.lang) + \
-                        mention.entity.title.replace(' ', '_')
-                })
+            m = {
+                "text": mention.text,
+                "entity": mention.entity.title,
+                "url": "https://{}.wikipedia.org/wiki/".format(self.lang) + \
+                    mention.entity.title.replace(' ', '_')
+            }
+            if m not in response:
+                response.append(m)
         return response
 
 
