@@ -32,18 +32,15 @@ RUN git clone https://github.com/facebookresearch/fastText.git /tmp/fastText && 
     cd /tmp/fastText && \
     pip install . && \
     cd /app && \
-    mkdir -p /app/src/data
+    mkdir -p /app/data
 
-ADD https://s3.amazonaws.com/tagger-eig/models/models.tar.gz /app/src/data
+# ADD https://s3.amazonaws.com/tagger-eig/models/models.tar.gz /app/src/data
 
-RUN tar zxvf /app/src/data/models.tar.gz -C /app/src/data/ && \
-    rm -f /app/src/data/models.tar.gz && \
-    cd /app && \
-    pip install -r requirements.txt && \
+# RUN tar zxvf /app/src/data/models.tar.gz -C /app/src/data/ && \
+#     rm -f /app/src/data/models.tar.gz && \
+RUN pip install -r requirements.txt && \
     python -m spacy download en_vectors_web_lg && \
     python -m spacy download fr
 
-ENV PYTHONPATH "${PYTHONPATH}:/app"
 
-ENTRYPOINT ["python"]
-CMD ["src/app.py"]
+CMD ["python", "app.py"]
