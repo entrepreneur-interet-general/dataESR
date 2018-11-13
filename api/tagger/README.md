@@ -2,6 +2,8 @@
 
 Version supportée : `python 2.7`(`python 3.6`)
 
+❗️ La version dockerisé nécessite au moins 15go par défault pour que le container puisse se lancer.
+
 # Services
 
 ## Extraire des mots clés
