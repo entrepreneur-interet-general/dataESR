@@ -1,10 +1,7 @@
 from flask import Flask, jsonify, json, request, abort
 from flask_restplus import Resource, Api
-from models.models import FastTextModel, Wikipedia2VecModel
-from downloader import Downloader
-from celery import Celery
+from models import FastTextModel, Wikipedia2VecModel
 import os
-import config
 import textacy
 import textacy.keyterms as tck
 
@@ -12,23 +9,25 @@ app = Flask(__name__)
 app.config.from_pyfile('config.py')
 api = Api(app)
 
-celery = Celery(app)
-#celery.conf.update(app.config)
 
 #preloading models
 try:
     model_fasttext_scopus = FastTextModel(app.config["FASTTEXT_FILE_MODEL_SCOPUS"])
     wikipedia2vec_models_en = Wikipedia2VecModel(
         'en', app.config["WIKIPEDIA2VEC_DIC_EN"], app.config["WIKIPEDIA2VEC_MENTION_EN"])
+    wikipedia2vec_models_fr = Wikipedia2VecModel(
+        'fr', app.config["WIKIPEDIA2VEC_DIC_FR"], app.config["WIKIPEDIA2VEC_MENTION_FR"])
     model_fasttext_pf = FastTextModel(app.config["FASTTEXT_FILE_MODEL_PF"])
+
+    MAPPING_MODELS = {
+        'scopus': model_fasttext_scopus,
+        'wiki2vec_en': wikipedia2vec_models_en,
+        'wiki2vec_fr':  wikipedia2vec_models_fr,
+        'pf': model_fasttext_pf
+    }
 except Exception as e :
     app.logger.error(e)
 
-MAPPING_MODELS = {
-    'scopus': model_fasttext_scopus,
-    'wiki2vec_en': wikipedia2vec_models_en,
-    'pf': model_fasttext_pf
-}
 
 class TextacyFormatting(object):
     """
@@ -102,22 +101,18 @@ class FastTextResponse(Resource):
 class Wikipedia2VecResponse(Resource):
     def post(self):
         data = request.json
+        lang = data.get('lang')
         try:
-            model = MAPPING_MODELS['wiki2vec_en']
+            if lang:
+                name_model = 'wiki2vec_{}'.format(lang)
+                model = MAPPING_MODELS[name_model]
+            else:
+                model = MAPPING_MODELS['wiki2vec_en']
             response = model.detect_mentions(data['text'])
             return jsonify(response)
         except Exception as e:
             abort(400, e)
 
-
-@api.route('/restart_downloader')
-class RestartDownloader(Resource):
-    def get(self):
-        downloaded = Downloader(app)
-        if os.path.exists(downloaded.download_dir):
-            return {'info': 'Data is present'}, 200
-        else:
-            return {'info': 'Failed to download data'}, 500
 
 if __name__ == '__main__':
     app.run(debug=True, threaded=True)
