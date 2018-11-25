@@ -1,15 +1,8 @@
-
-# coding: utf-8
-
-# In[2]:
-
-
+"""
+Script pour calculer les coefficients tf-idfs à partir de 
+Wikipedia en utilisant le multiprocess et Gensim.
+"""
 from gensim.corpora import MmCorpus
-
-
-# In[36]:
-
-
 from multiprocessing import Array, Process, Pool, Queue, Manager
 import numpy as np
 import tqdm
@@ -17,6 +10,7 @@ import sys
 import gensim 
 import numpy as np
 import multiprocessing as mp
+import io
 
 from gensim.models import TfidfModel
 from gensim.corpora import Dictionary, MmCorpus
@@ -24,11 +18,6 @@ from gensim.corpora import Dictionary, MmCorpus
 tf_idf_model = TfidfModel.load('/mnt/disk/wikipedia/wikipedia.tfidf_model')
 dct = Dictionary.load_from_text('/mnt/disk/wikipedia/wikipedia_wordids.txt.bz2')
 corpus = MmCorpus('/mnt/disk/wikipedia/wikipedia_bow.mm')
-
-import io
-
-
-# In[20]:
 
 
 def load_vectors(fname):
@@ -41,10 +30,6 @@ def load_vectors(fname):
     return data
 
 w2v_fasttext = load_vectors('wiki-news-300d-1M.vec')
-
-
-# In[ ]:
-
 
 import numpy as np
 
