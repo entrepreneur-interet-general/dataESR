@@ -1,5 +1,5 @@
 import unittest
-from src.app import TextacyFormatting
+from tagger.app import TextacyFormatting
 from operator import itemgetter
 import numpy as np
 

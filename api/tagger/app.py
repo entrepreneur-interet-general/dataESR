@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, json, request, abort
-from flask_restplus import Resource, Api
+from flask_restplus import Resource, Api, Namespace
 from models import FastTextModel, Wikipedia2VecModel
 import os
 import textacy
@@ -8,7 +8,10 @@ import textacy.keyterms as tck
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 api = Api(app)
-
+ns = Namespace("tagger",
+               description="tagger api",
+               path='/tagger')
+api.add_namespace(ns)
 
 #preloading models
 try:
@@ -62,7 +65,7 @@ class TextacyFormatting(object):
         return keywords
 
 
-@api.route('/keywords')
+@ns.route('/keywords')
 class TextacyResponse(Resource):
     def post(self):
         data = request.json
@@ -78,7 +81,7 @@ class TextacyResponse(Resource):
                 abort(400, e)   
 
 
-@api.route('/predictions_fasttext')
+@ns.route('/predictions_fasttext')
 class FastTextResponse(Resource):
     def post(self):
         data = request.json
@@ -97,7 +100,7 @@ class FastTextResponse(Resource):
             abort(400, e)
 
 
-@api.route('/entity_linking')
+@ns.route('/entity_linking')
 class Wikipedia2VecResponse(Resource):
     def post(self):
         data = request.json

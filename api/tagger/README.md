@@ -1,6 +1,6 @@
 # Documentation du service Flask de tagging
 
-Version supportée : `python 2.7`(`python 3.6`)
+Version supportée : `python 3.6`
 
 ❗️ La version dockerisé nécessite au moins 15go par défault pour que le container puisse se lancer.
 
@@ -15,7 +15,7 @@ Le service permet d'extraire des mots clés d'un texte en utilisant la librairie
 
 ### API
 
-#### POST /keywords
+#### POST /tagger/keywords
 
 #### Example request
 
@@ -72,9 +72,26 @@ Le service permet d'extraire des mots clés d'un texte en utilisant la librairie
 
 ### API
 
-#### POST /predict_fasttext
+#### POST /tagger/predictions_fasttext
 
 ### Scopus
+
+#### entrainement
+
+L'entrainement de ce modèle repose sur les données de la base *ISTEX* en utilisant comme annotation l'ontologie de la base SCOPUS et utilise la librairie `fastText` de Facebook.
+
+#### Example request :
+```json
+{
+    "text": "Coherent coupling of individual quantum dots measured with phase-referenced two-dimensional spectroscopy: Photon echo versus double quantum coherence",
+    "model": "scopus"
+}
+```
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `text` | string | Text to be processed |
+| `model` | string | Model to use ("scopus") |
 
 ### PascalFrancis
 
@@ -82,7 +99,7 @@ Le service permet d'extraire des mots clés d'un texte en utilisant la librairie
 
 ### API 
 
-### POST /entity_linking
+#### POST /tagger/entity_linking
 
 #### Example request :
 ```json
