@@ -4,8 +4,9 @@ EXPOSE 5000
 COPY . /app
 WORKDIR /app
 
-ENV http_proxy http://10.244.16.10:9090
-ENV https_proxy https://10.244.16.10:9090
+#local proxy
+#ENV http_proxy http://10.244.16.10:9090
+#ENV https_proxy https://10.244.16.10:9090
 
 #because else, textacy fail to install cld2-cffi to detect language
 ENV CFLAGS "-Wno-narrowing"
@@ -36,7 +37,7 @@ RUN git clone https://github.com/facebookresearch/fastText.git /tmp/fastText && 
 
 ADD https://s3.amazonaws.com/tagger-eig/models/models.tar.gz /app/data
 
-RUN tar zxvf /app/src/data/models.tar.gz -C /app/data/ && \
+RUN tar zxvf /app/data/models.tar.gz -C /app/data/ && \
     rm -f /app/data/models.tar.gz && \
     pip install -r requirements.txt && \
     python -m spacy download en_vectors_web_lg && \
