@@ -85,7 +85,6 @@ class TextacyResponse(Resource):
 class FastTextResponse(Resource):
     def post(self):
         data = request.json
-        app.logger.debug('test')
         try:
             m = MAPPING_MODELS[data['model']]
             k = int(data.get('k')) if data.get('k') else 1
