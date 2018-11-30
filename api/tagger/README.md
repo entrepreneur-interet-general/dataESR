@@ -1,10 +1,24 @@
 # Documentation du service Flask de tagging
 
 Version supportée : `python 3.6`
+Docker version testée : `Docker version 18.06.1-ce, build e68fc7a`
 
 ❗️ La version dockerisé nécessite au moins 15go par défault pour que le container puisse se lancer.
 
 # Services
+
+## Pour lancer le service
+
+Pour lancer l'api :
+```
+sudo docker build -t tagger . 
+sudo docker run -d -p 5000:5000 tagger
+```
+
+## Infos
+
+Le service utilise un bucket `s3` pour télécharger les modèles construits à l'adresse suivante : `https://s3.amazonaws.com/tagger-eig/models/models.tar.gz`.
+Si ce fichier change, il faut mettre à jour dans le fichier `config.py` les nouveaux noms correspondant aux modèles et le `Dockerfile`.
 
 ## Extraire des mots clés
 
@@ -84,7 +98,8 @@ L'entrainement de ce modèle repose sur les données de la base *ISTEX* en utili
 ```json
 {
     "text": "Coherent coupling of individual quantum dots measured with phase-referenced two-dimensional spectroscopy: Photon echo versus double quantum coherence",
-    "model": "scopus"
+    "model": "scopus",
+    "k": 3
 }
 ```
 
@@ -92,10 +107,73 @@ L'entrainement de ce modèle repose sur les données de la base *ISTEX* en utili
 | ---- | ---- | ----------- |
 | `text` | string | Text to be processed |
 | `model` | string | Model to use ("scopus") |
+| `k` | int | Number of predictions to display (default: 1) |
+| `threshold`| float | Fasttext threshold (default: 0) |
 
+#### Exemple response :
+
+```json
+{
+  "labels": [
+    {
+      "label": "Physics and Astronomy",
+      "probas": 0.37525737285614014
+    },
+    {
+      "label": "General Physics and Astronomy",
+      "probas": 0.23475822806358337
+    },
+    {
+      "label": "Physical Sciences",
+      "probas": 0.20027048885822296
+    }
+  ]
+}
+```
 ### PascalFrancis
 
+#### entrainement
+
+L'entrainement de ce modèle repose sur les données de la base *PascalFrancis* en utilisant son ontologie comme annotation et la librairie `fastText` de Facebook.
+
+#### Example request :
+```json
+{
+    "text": "Coherent coupling of individual quantum dots measured with phase-referenced two-dimensional spectroscopy: Photon echo versus double quantum coherence",
+    "model": "pf",
+    "k": 3
+}
+```
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `text` | string | Text to be processed |
+| `model` | string | Model to use ("scopus") |
+| `k` | int | Number of predictions to display (default: 1) |
+| `threshold`| float | Fasttext threshold (default: 0) |
+
+#### Example response :
+```json
+{
+  "labels": [
+    {
+      "label": "pascal::001B::fr Physique::en Physics",
+      "probas": 0.15214012563228607
+    },
+    {
+      "label": "pascal::001::fr Sciences exactes et technologie::en Exact sciences and technology",
+      "probas": 0.07756912708282471
+    },
+    {
+      "label": "macrodomain::pec::fr Physique de l'\u00e9tat condens\u00e9::en Condensed state physics",
+      "probas": 0.0654236301779747
+    }
+  ]
+}
+```
 ## Lier du texte à des entités Wikipedia
+
+Ce service permet d'extraire du texte des entités existant dans Wikipedia en utilisant un framework open source appelé [Wikipedia2vec](https://wikipedia2vec.github.io).
 
 ### API 
 
@@ -138,13 +216,6 @@ L'entrainement de ce modèle repose sur les données de la base *ISTEX* en utili
 | `text` | string | Text linked to the entity |
 | `url` | string | Wikipedia url of the entity |
 
-## Pour lancer le service
-
-Pour lancer l'api :
-```
-sudo docker build -t tagger . 
-sudo docker run -d -p 5000:5000 tagger
-```
 
 ## Tester
 

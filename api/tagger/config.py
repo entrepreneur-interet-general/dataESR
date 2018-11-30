@@ -1,6 +1,8 @@
 import os
 import logging
 
+### Using files names from model file in s3 bucket 
+### https://s3.amazonaws.com/tagger-eig/models/models.tar.gz
 FASTTEXT_FILE_MODEL_SCOPUS = os.path.join(
     os.getcwd(), 'data', 'model_scopus.bin')
 FASTTEXT_FILE_MODEL_PF = os.path.join(
