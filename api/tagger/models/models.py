@@ -108,7 +108,7 @@ class TfidfEmbeddingVectorizer:
 
 class FastTextModel:
     def __init__(self, filename):
-        print('Loading fastText model...')
+        logging.info('Loading fastText model {}'.format(filename))
         self.model = fastText.load_model(filename)
     def make_prediction(self, query, k, threshold):
         """
