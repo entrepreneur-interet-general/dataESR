@@ -130,6 +130,12 @@ L'entrainement de ce modèle repose sur les données de la base *ISTEX* en utili
   ]
 }
 ```
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `label` | string | Scopus label |
+| `probas` | float | Probability associated to the prediction |
+
 ### PascalFrancis
 
 #### entrainement
@@ -171,6 +177,12 @@ L'entrainement de ce modèle repose sur les données de la base *PascalFrancis* 
   ]
 }
 ```
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `label` | string | Pascal Francis label |
+| `probas` | float | Probability associated to the prediction |
+
 ## Lier du texte à des entités Wikipedia
 
 Ce service permet d'extraire du texte des entités existant dans Wikipedia en utilisant un framework open source appelé [Wikipedia2vec](https://wikipedia2vec.github.io).
