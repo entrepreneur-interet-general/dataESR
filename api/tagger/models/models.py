@@ -118,7 +118,6 @@ class FastTextModel:
         text = query['text']
         print(text, k, threshold)
         labels, probas = self.model.predict(text, k, threshold)
-        print(labels)
         return [{"label": l, "probas": p} for l, p in zip(labels, probas)]
     def build_context_vector(self, keywords):
         words = keywords.split()
