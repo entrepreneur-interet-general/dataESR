@@ -116,7 +116,6 @@ class FastTextModel:
         - threshold (float): Filter classes with a probability below threshold (default: 0.0)
         """
         text = query['text']
-        print(text, k, threshold)
         labels, probas = self.model.predict(text, k, threshold)
         return [{"label": l, "probas": p} for l, p in zip(labels, probas)]
     def build_context_vector(self, keywords):
@@ -130,7 +129,7 @@ class Wikipedia2VecModel:
         self.dic = Dictionary.load(dic)
         self.mention_db = MentionDB.load(mention_db, self.dic)
     def detect_mentions(self, text):
-        print("Detecting mentions...")
+        logging.info("Detecting mentions...")
         tokenizer = RegexpTokenizer()
         tokens = tokenizer.tokenize(text)
         response = []
